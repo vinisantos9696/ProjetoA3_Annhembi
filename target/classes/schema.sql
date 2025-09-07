@@ -69,10 +69,25 @@ CREATE TABLE IF NOT EXISTS equipe_projetos (
     FOREIGN KEY (projeto_id) REFERENCES projetos(id) ON DELETE CASCADE
 );
 
--- Inserir um usuário administrador padrão para o primeiro login, se não existir.
--- A sintaxe foi corrigida para evitar o erro 'Duplicate column name'.
+-- Inserir usuários padrão para o primeiro login, se não existirem.
+
+-- Usuário Administrador
 INSERT INTO usuarios (nome_completo, username, senha, perfil)
 SELECT col1, col2, col3, col4 FROM (SELECT 'Administrador' AS col1, 'admin' AS col2, 'admin' AS col3, 'administrador' AS col4) AS tmp
 WHERE NOT EXISTS (
     SELECT username FROM usuarios WHERE username = 'admin'
+) LIMIT 1;
+
+-- Usuário Gerente de Teste
+INSERT INTO usuarios (nome_completo, username, senha, perfil)
+SELECT col1, col2, col3, col4 FROM (SELECT 'Gerente de Teste' AS col1, 'gerente' AS col2, 'gerente' AS col3, 'gerente' AS col4) AS tmp
+WHERE NOT EXISTS (
+    SELECT username FROM usuarios WHERE username = 'gerente'
+) LIMIT 1;
+
+-- Usuário Colaborador de Teste
+INSERT INTO usuarios (nome_completo, username, senha, perfil)
+SELECT col1, col2, col3, col4 FROM (SELECT 'Colaborador de Teste' AS col1, 'colab' AS col2, 'colab' AS col3, 'colaborador' AS col4) AS tmp
+WHERE NOT EXISTS (
+    SELECT username FROM usuarios WHERE username = 'colab'
 ) LIMIT 1;
