@@ -1,8 +1,7 @@
-<<<<<<< HEAD
 -- Garante uma base limpa, removendo tabelas antigas na ordem correta para evitar erros de FK.
 
 -- 1. Remove as tabelas de associação que dependem de outras.
-DROP TABLE IF EXISTS projeto_equipes;
+DROP TABLE IF EXISTS projeto_equipes; -- Tabela antiga, mantida para limpeza
 DROP TABLE IF EXISTS equipe_projetos;
 DROP TABLE IF EXISTS equipe_membros;
 
@@ -14,8 +13,6 @@ DROP TABLE IF EXISTS projetos;
 DROP TABLE IF EXISTS equipes;
 DROP TABLE IF EXISTS usuarios;
 
-=======
->>>>>>> f183713ac417e0cd9647804be3d3d20d8605be58
 -- Tabela de Usuários
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -25,15 +22,12 @@ CREATE TABLE IF NOT EXISTS usuarios (
     perfil VARCHAR(50) NOT NULL -- 'administrador', 'gerente', 'colaborador'
 );
 
-<<<<<<< HEAD
 -- Tabela de Equipes
 CREATE TABLE IF NOT EXISTS equipes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL UNIQUE
 );
 
-=======
->>>>>>> f183713ac417e0cd9647804be3d3d20d8605be58
 -- Tabela de Projetos
 CREATE TABLE IF NOT EXISTS projetos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -57,15 +51,6 @@ CREATE TABLE IF NOT EXISTS tarefas (
     FOREIGN KEY (responsavel_id) REFERENCES usuarios(id) ON DELETE SET NULL
 );
 
-<<<<<<< HEAD
-=======
--- Tabela de Equipes
-CREATE TABLE IF NOT EXISTS equipes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(255) NOT NULL UNIQUE
-);
-
->>>>>>> f183713ac417e0cd9647804be3d3d20d8605be58
 -- Tabela de Associação: Equipe <-> Membros (Usuários)
 CREATE TABLE IF NOT EXISTS equipe_membros (
     equipe_id INT,
@@ -85,14 +70,9 @@ CREATE TABLE IF NOT EXISTS equipe_projetos (
 );
 
 -- Inserir um usuário administrador padrão para o primeiro login, se não existir.
-<<<<<<< HEAD
 -- A sintaxe foi corrigida para evitar o erro 'Duplicate column name'.
 INSERT INTO usuarios (nome_completo, username, senha, perfil)
 SELECT col1, col2, col3, col4 FROM (SELECT 'Administrador' AS col1, 'admin' AS col2, 'admin' AS col3, 'administrador' AS col4) AS tmp
-=======
-INSERT INTO usuarios (nome_completo, username, senha, perfil)
-SELECT * FROM (SELECT 'Administrador', 'admin', 'admin', 'administrador') AS tmp
->>>>>>> f183713ac417e0cd9647804be3d3d20d8605be58
 WHERE NOT EXISTS (
     SELECT username FROM usuarios WHERE username = 'admin'
 ) LIMIT 1;
