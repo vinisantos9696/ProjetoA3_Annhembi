@@ -6,6 +6,8 @@ import br.com.projeto.model.Projeto;
 import br.com.projeto.model.Usuario;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EquipeDAO {
 
@@ -117,5 +119,32 @@ public class EquipeDAO {
                 pstmt.executeBatch();
             }
         }
+    }
+
+    /**
+     * Busca todas as equipes cadastradas no banco de dados.
+     * @return Uma lista de objetos Equipe.
+     */
+    public List<Equipe> buscarTodas() {
+        List<Equipe> equipes = new ArrayList<>();
+        String sql = "SELECT id, nome FROM equipes ORDER BY nome";
+
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Equipe equipe = new Equipe();
+                equipe.setId(rs.getInt("id"));
+                equipe.setNome(rs.getString("nome"));
+                equipes.add(equipe);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar equipes: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return equipes;
     }
 }

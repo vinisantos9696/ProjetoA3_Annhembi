@@ -5,6 +5,8 @@ import br.com.projeto.model.Projeto;
 import br.com.projeto.model.Usuario;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProjetoDAO {
 
@@ -43,6 +45,48 @@ public class ProjetoDAO {
             System.err.println("Erro ao salvar projeto: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Busca todos os projetos e seus respectivos gerentes para exibição em relatórios.
+     * @return Uma lista de objetos Projeto, cada um com seu gerente (se houver).
+     */
+    public List<Projeto> buscarTodosParaRelatorio() {
+        List<Projeto> projetos = new ArrayList<>();
+        // A consulta SQL une a tabela de projetos com a de usuários para buscar o nome do gerente.
+        String sql = "SELECT p.*, u.nome_completo AS gerente_nome FROM projetos p LEFT JOIN usuarios u ON p.gerente_id = u.id ORDER BY p.nome";
+
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Projeto projeto = new Projeto();
+                projeto.setId(rs.getInt("id"));
+                projeto.setNome(rs.getString("nome"));
+                projeto.setDescricao(rs.getString("descricao"));
+                projeto.setDataInicio(rs.getDate("data_inicio"));
+                projeto.setDataFim(rs.getDate("data_fim"));
+                projeto.setStatus(rs.getString("status"));
+                projeto.setGerenteId(rs.getInt("gerente_id"));
+
+                // Se houver um gerente associado, cria o objeto Usuario e o associa ao projeto.
+                if (rs.getInt("gerente_id") != 0) {
+                    Usuario gerente = new Usuario();
+                    gerente.setId(rs.getInt("gerente_id"));
+                    gerente.setNomeCompleto(rs.getString("gerente_nome"));
+                    projeto.setGerente(gerente);
+                }
+
+                projetos.add(projeto);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar projetos para relatório: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return projetos;
     }
 
     // Outros métodos como buscarPorId, listarTodos, excluir podem ser adicionados aqui.

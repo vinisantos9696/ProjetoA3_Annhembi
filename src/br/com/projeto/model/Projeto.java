@@ -10,7 +10,8 @@ public class Projeto {
     private Date dataInicio;
     private Date dataFim;
     private String status; // Ex: "Em andamento", "Concluído", "Pendente"
-    private Usuario gerente; // Referência ao gerente do projeto
+    private int gerenteId; // ID do gerente, para facilitar o acesso ao banco
+    private Usuario gerente; // Referência ao objeto gerente completo
 
     // Construtor Padrão
     public Projeto() {
@@ -25,6 +26,9 @@ public class Projeto {
         this.dataFim = dataFim;
         this.status = status;
         this.gerente = gerente;
+        if (gerente != null) {
+            this.gerenteId = gerente.getId();
+        }
     }
 
     // Getters e Setters
@@ -74,6 +78,14 @@ public class Projeto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getGerenteId() {
+        return gerenteId;
+    }
+
+    public void setGerenteId(int gerenteId) {
+        this.gerenteId = gerenteId;
     }
 
     public Usuario getGerente() {

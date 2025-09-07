@@ -91,3 +91,57 @@ SELECT col1, col2, col3, col4 FROM (SELECT 'Colaborador de Teste' AS col1, 'cola
 WHERE NOT EXISTS (
     SELECT username FROM usuarios WHERE username = 'colab'
 ) LIMIT 1;
+
+-- ##################################################################
+-- ## DADOS DE EXEMPLO PARA TESTES ##
+-- ##################################################################
+
+-- Inserir Projetos de Exemplo (assumindo que o gerente 'gerente' tem ID 2)
+INSERT INTO projetos (nome, descricao, data_inicio, data_fim, status, gerente_id)
+SELECT * FROM (SELECT 'Desenvolvimento do Novo App Mobile', 'Criar um novo aplicativo para iOS e Android.', '2024-01-15', '2024-08-30', 'Em Andamento', 2) AS tmp
+WHERE NOT EXISTS (SELECT nome FROM projetos WHERE nome = 'Desenvolvimento do Novo App Mobile');
+
+INSERT INTO projetos (nome, descricao, data_inicio, data_fim, status, gerente_id)
+SELECT * FROM (SELECT 'Migração de Servidores para a Nuvem', 'Mover toda a infraestrutura on-premise para a AWS.', '2024-03-01', '2024-12-01', 'Planejado', 2) AS tmp
+WHERE NOT EXISTS (SELECT nome FROM projetos WHERE nome = 'Migração de Servidores para a Nuvem');
+
+INSERT INTO projetos (nome, descricao, data_inicio, data_fim, status, gerente_id)
+SELECT * FROM (SELECT 'Website Corporativo - Redesign', 'Atualizar o design e conteúdo do site principal da empresa.', '2023-11-10', '2024-04-20', 'Concluído', 2) AS tmp
+WHERE NOT EXISTS (SELECT nome FROM projetos WHERE nome = 'Website Corporativo - Redesign');
+
+-- Inserir Tarefas de Exemplo (assumindo que os projetos e usuários existem com os IDs corretos)
+INSERT INTO tarefas (descricao, status, projeto_id, responsavel_id)
+SELECT * FROM (SELECT 'Desenhar mockups da interface do app', 'Concluído', 1, 3) AS tmp
+WHERE NOT EXISTS (SELECT id FROM tarefas WHERE descricao = 'Desenhar mockups da interface do app' AND projeto_id = 1);
+
+INSERT INTO tarefas (descricao, status, projeto_id, responsavel_id)
+SELECT * FROM (SELECT 'Desenvolver a API de autenticação', 'Em Andamento', 1, 3) AS tmp
+WHERE NOT EXISTS (SELECT id FROM tarefas WHERE descricao = 'Desenvolver a API de autenticação' AND projeto_id = 1);
+
+INSERT INTO tarefas (descricao, status, projeto_id, responsavel_id)
+SELECT * FROM (SELECT 'Analisar provedores de nuvem (AWS, Azure, Google Cloud)', 'Planejado', 2, 3) AS tmp
+WHERE NOT EXISTS (SELECT id FROM tarefas WHERE descricao = 'Analisar provedores de nuvem (AWS, Azure, Google Cloud)' AND projeto_id = 2);
+
+-- Inserir Equipes de Exemplo
+INSERT INTO equipes (nome)
+SELECT 'Equipe Alpha (Mobile)' FROM DUAL WHERE NOT EXISTS (SELECT nome FROM equipes WHERE nome = 'Equipe Alpha (Mobile)');
+
+INSERT INTO equipes (nome)
+SELECT 'Equipe Bravo (Infra)' FROM DUAL WHERE NOT EXISTS (SELECT nome FROM equipes WHERE nome = 'Equipe Bravo (Infra)');
+
+INSERT INTO equipes (nome)
+SELECT 'Equipe Charlie (Web)' FROM DUAL WHERE NOT EXISTS (SELECT nome FROM equipes WHERE nome = 'Equipe Charlie (Web)');
+
+-- Associar Membros à Equipe (assumindo que as equipes e usuários têm os IDs corretos)
+INSERT INTO equipe_membros (equipe_id, usuario_id)
+SELECT 1, 3 FROM DUAL WHERE NOT EXISTS (SELECT equipe_id, usuario_id FROM equipe_membros WHERE equipe_id = 1 AND usuario_id = 3);
+
+INSERT INTO equipe_membros (equipe_id, usuario_id)
+SELECT 2, 2 FROM DUAL WHERE NOT EXISTS (SELECT equipe_id, usuario_id FROM equipe_membros WHERE equipe_id = 2 AND usuario_id = 2);
+
+-- Associar Equipes a Projetos
+INSERT INTO equipe_projetos (equipe_id, projeto_id)
+SELECT 1, 1 FROM DUAL WHERE NOT EXISTS (SELECT equipe_id, projeto_id FROM equipe_projetos WHERE equipe_id = 1 AND projeto_id = 1);
+
+INSERT INTO equipe_projetos (equipe_id, projeto_id)
+SELECT 2, 2 FROM DUAL WHERE NOT EXISTS (SELECT equipe_id, projeto_id FROM equipe_projetos WHERE equipe_id = 2 AND projeto_id = 2);
