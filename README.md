@@ -61,11 +61,19 @@ Para que a aplicação possa se conectar ao banco de dados, você precisa inform
 2.  No canto superior direito, clique no menu de configurações de execução e selecione **`Edit Configurations...`**.
 3.  Selecione a configuração de execução da sua classe `Main`.
 4.  Encontre o campo **`Environment variables`** e clique no ícone de pasta ou no botão `...` para abrir o editor.
-5.  Adicione duas novas variáveis:
-    *   **Name:** `DB_USER`
-        *   **Value:** `root` (ou o seu usuário do MySQL)
-    *   **Name:** `DB_PASSWORD`
-        *   **Value:** `sua_senha_aqui` (substitua pela sua senha real do MySQL)
+5.  Adicione as variáveis conforme o exemplo abaixo.
+
+---
+
+**Opção Rápida (Copiar e Colar):**
+
+Você pode clicar no botão `...` ao lado de `Environment variables` e colar o texto abaixo diretamente na janela que abrir. **Lembre-se de trocar `sua_senha_aqui` pela sua senha real do MySQL.**
+
+```
+DB_USER=root;DB_PASSWORD=sua_senha_aqui
+```
+---
+
 6.  Clique em **OK** para salvar as variáveis e depois em **Apply** e **OK** para fechar as configurações.
 
 ### Passo 4: Executar o Projeto
