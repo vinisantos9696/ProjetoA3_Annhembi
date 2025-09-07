@@ -31,29 +31,19 @@ O sistema foi projetado para ser uma solução robusta e intuitiva para pequenas
 *   **Build Tool:** Maven (implícito pelo uso de dependências como o MySQL Connector)
 *   **IDE de Desenvolvimento:** IntelliJ IDEA (ou outra de sua preferência)
 
-## 4. Configuração do Ambiente (Passo a Passo)
+## 4. Configuração e Execução
 
 Siga estes passos para configurar e executar o projeto em sua máquina local.
 
-### Passo 1: Pré-requisitos
+### Pré-requisitos
 
 *   **Java Development Kit (JDK):** Versão 8 ou superior.
-*   **MySQL Server:** Versão 8 ou superior.
+*   **MySQL Server:** Versão 8 ou superior, com um usuário `root` configurado.
 *   **IDE Java:** IntelliJ IDEA, Eclipse ou outra de sua preferência.
-*   **Cliente MySQL:** MySQL Workbench, DBeaver ou outro para gerenciar o banco de dados.
 
-### Passo 2: Configurar o Banco de Dados
+### Passo 1: Configurar a Senha do Banco de Dados
 
-1.  Abra seu cliente MySQL e conecte-se ao seu servidor de banco de dados.
-2.  Crie um novo banco de dados (schema) com o nome `gestao_projetos_db`.
-    ```sql
-    CREATE DATABASE gestao_projetos_db;
-    ```
-3.  **Não é necessário executar o script `schema.sql` manualmente.** A aplicação Java foi projetada para criar e popular a estrutura do banco de dados automaticamente na primeira execução.
-
-### Passo 3: Configurar as Variáveis de Ambiente na IDE
-
-Para que a aplicação possa se conectar ao banco de dados, você precisa informar o usuário e a senha. Isso é feito de forma segura através de variáveis de ambiente.
+O sistema se conecta ao MySQL usando o usuário `root`. A única configuração manual necessária é informar a senha deste usuário para a aplicação através de uma variável de ambiente.
 
 **No IntelliJ IDEA:**
 
@@ -61,32 +51,26 @@ Para que a aplicação possa se conectar ao banco de dados, você precisa inform
 2.  No canto superior direito, clique no menu de configurações de execução e selecione **`Edit Configurations...`**.
 3.  Selecione a configuração de execução da sua classe `Main`.
 4.  Encontre o campo **`Environment variables`** e clique no ícone de pasta ou no botão `...` para abrir o editor.
-5.  Adicione as variáveis conforme o exemplo abaixo.
+5.  Cole o texto abaixo, **substituindo `sua_senha_aqui` pela sua senha real do MySQL**.
 
----
+    ```
+    DB_PASSWORD=sua_senha_aqui
+    ```
 
-**Opção Rápida (Copiar e Colar):**
+6.  Clique em **OK** para salvar a variável e depois em **Apply** e **OK** para fechar as configurações.
 
-Você pode clicar no botão `...` ao lado de `Environment variables` e colar o texto abaixo diretamente na janela que abrir. **Lembre-se de trocar `sua_senha_aqui` pela sua senha real do MySQL.**
-
-```
-DB_USER=root;DB_PASSWORD=sua_senha_aqui
-```
----
-
-6.  Clique em **OK** para salvar as variáveis e depois em **Apply** e **OK** para fechar as configurações.
-
-### Passo 4: Executar o Projeto
+### Passo 2: Executar o Projeto
 
 1.  Abra a classe `br.com.projeto.main.Main.java`.
 2.  Clique no botão verde de "Play" ao lado do método `main` para executar a aplicação.
-3.  Na primeira vez, o sistema irá configurar o banco de dados e, em seguida, a tela de login aparecerá.
+
+> **Como funciona o Banco de Dados:** Na primeira vez que a aplicação é executada, ela cria o banco de dados `gestao_projetos_db` e o popula com dados de exemplo. A partir da segunda execução, a aplicação apenas se conecta ao banco de dados existente, **preservando todos os dados** que foram cadastrados.
 
 ## 5. Guia de Testes do Sistema
 
-Para testar todas as funcionalidades, faça o login com os três perfis de usuário padrão.
+Para testar todas as funcionalidades, faça o login com os três perfis de usuário padrão. Após a primeira execução, os dados que você criar serão mantidos.
 
-**Credenciais Padrão:**
+**Credenciais Padrão (criadas na primeira execução):**
 *   **Administrador:**
     *   **Usuário:** `admin`
     *   **Senha:** `admin`
@@ -108,12 +92,6 @@ Para testar todas as funcionalidades, faça o login com os três perfis de usuá
     *   Clique em **"Novo Usuário"**, crie um usuário de teste e salve. Verifique se ele aparece na lista.
     *   Selecione o usuário criado, clique em **"Editar Usuário"**, altere seu nome e salve. Verifique a alteração.
     *   Selecione o usuário criado e clique em **"Excluir Usuário"**. Confirme a exclusão.
-4.  **Gerenciar Projetos:**
-    *   Vá em `Cadastros -> Projetos`.
-    *   Teste os botões **"Novo"**, **"Editar"** e **"Excluir"** como fez para usuários.
-5.  **Gerar Relatórios:**
-    *   Vá em `Relatórios -> Andamento dos Projetos`. Verifique se a janela abre com os dados.
-    *   Vá em `Relatórios -> Desempenho dos Colaboradores`. Verifique se a janela abre com os dados.
 
 ---
 
@@ -123,11 +101,9 @@ Para testar todas as funcionalidades, faça o login com os três perfis de usuá
 2.  **Verificar Acesso:**
     *   Confirme que o menu **"Relatórios"** está visível.
     *   Confirme que no menu **"Cadastros"**, o item **"Usuários"** **NÃO** está visível.
-3.  **Gerenciar Projetos:**
-    *   Vá em `Cadastros -> Projetos`.
+3.  **Gerenciar Projetos, Equipes e Tarefas:**
+    *   Vá em `Cadastros -> Projetos` (e depois em Equipes e Tarefas).
     *   Verifique se os botões **"Novo"**, **"Editar"** e **"Excluir"** estão **habilitados**. Teste-os.
-4.  **Gerenciar Equipes e Tarefas:**
-    *   Repita o teste acima para as telas de `Equipes` e `Tarefas`.
 
 ---
 
@@ -135,9 +111,7 @@ Para testar todas as funcionalidades, faça o login com os três perfis de usuá
 
 1.  **Login:** Use as credenciais de `colab`.
 2.  **Verificar Acesso:**
-    *   Confirme que o menu **"Relatórios"** **NÃO** está visível.
-    *   Confirme que no menu **"Cadastros"**, o item **"Usuários"** **NÃO** está visível.
+    *   Confirme que os menus **"Relatórios"** e **"Usuários"** **NÃO** estão visíveis.
 3.  **Verificar Permissões de Edição:**
-    *   Vá em `Cadastros -> Projetos`.
+    *   Vá em `Cadastros -> Projetos` (e depois em Equipes e Tarefas).
     *   Verifique se os botões **"Novo"**, **"Editar"** e **"Excluir"** estão **desabilitados**.
-    *   Repita a verificação para as telas de `Equipes` e `Tarefas`.

@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         // 1. Garante que o banco de dados e as tabelas estejam prontos.
         try {
-            DatabaseSetup.checkAndCreateDatabase();
+            DatabaseSetup.setupDatabase();
         } catch (Exception e) {
             System.err.println("Falha crítica na inicialização do banco de dados. A aplicação será encerrada.");
             e.printStackTrace();
