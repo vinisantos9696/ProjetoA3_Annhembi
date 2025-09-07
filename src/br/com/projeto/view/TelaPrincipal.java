@@ -3,12 +3,14 @@ package br.com.projeto.view;
 import br.com.projeto.model.Usuario;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class TelaPrincipal extends JFrame {
 
-    private Usuario usuarioLogado;
+    private final Usuario usuarioLogado;
+
+    // Componentes que terão a visibilidade controlada
+    private final JMenuItem itemUsuarios;
+    private final JMenu menuRelatorios;
 
     public TelaPrincipal(Usuario usuario) {
         this.usuarioLogado = usuario;
@@ -32,7 +34,7 @@ public class TelaPrincipal extends JFrame {
         JMenuItem itemProjetos = new JMenuItem("Projetos");
         JMenuItem itemTarefas = new JMenuItem("Tarefas");
         JMenuItem itemEquipes = new JMenuItem("Equipes");
-        JMenuItem itemUsuarios = new JMenuItem("Usuários");
+        itemUsuarios = new JMenuItem("Usuários"); // Atribuído à variável de instância
         menuCadastros.add(itemProjetos);
         menuCadastros.add(itemTarefas);
         menuCadastros.add(itemEquipes);
@@ -40,7 +42,7 @@ public class TelaPrincipal extends JFrame {
         menuCadastros.add(itemUsuarios);
 
         // Menu Relatórios
-        JMenu menuRelatorios = new JMenu("Relatórios");
+        menuRelatorios = new JMenu("Relatórios"); // Atribuído à variável de instância
         JMenuItem itemRelatorioProjetos = new JMenuItem("Andamento dos Projetos");
         JMenuItem itemRelatorioDesempenho = new JMenuItem("Desempenho dos Colaboradores");
         menuRelatorios.add(itemRelatorioProjetos);
@@ -57,7 +59,31 @@ public class TelaPrincipal extends JFrame {
         // Adiciona um label de boas-vindas
         JLabel welcomeLabel = new JLabel("Bem-vindo ao sistema, " + usuarioLogado.getNomeCompleto() + "! Seu perfil é: " + usuarioLogado.getPerfil(), SwingConstants.CENTER);
         add(welcomeLabel);
-        
-        // TODO: Adicionar lógica de permissões para habilitar/desabilitar menus com base no perfil do usuário.
+
+        // Aplica as regras de permissão à interface
+        configurarPermissoes();
+    }
+
+    /**
+     * Configura a visibilidade dos menus com base no perfil do usuário logado.
+     */
+    private void configurarPermissoes() {
+        String perfil = usuarioLogado.getPerfil();
+
+        // Converte para minúsculas para evitar problemas com case-sensitive (ex: "Administrador" vs "administrador")
+        if (perfil == null) {
+            perfil = ""; // Evita NullPointerException
+        }
+
+        boolean isAdministrador = "administrador".equalsIgnoreCase(perfil);
+        boolean isGerente = "gerente".equalsIgnoreCase(perfil);
+
+        // --- Regras de Visibilidade ---
+
+        // O item de menu "Usuários" só deve ser visível para administradores.
+        itemUsuarios.setVisible(isAdministrador);
+
+        // O menu "Relatórios" é visível para administradores e gerentes.
+        menuRelatorios.setVisible(isAdministrador || isGerente);
     }
 }
