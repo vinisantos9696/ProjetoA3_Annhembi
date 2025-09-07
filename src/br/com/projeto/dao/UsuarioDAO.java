@@ -100,6 +100,33 @@ public class UsuarioDAO {
     }
 
     /**
+     * Busca todos os usuários que podem ser gerentes de projeto (perfis 'gerente' ou 'administrador').
+     * @return Uma lista de objetos Usuario que podem ser gerentes.
+     */
+    public List<Usuario> buscarGerentes() {
+        List<Usuario> gerentes = new ArrayList<>();
+        String sql = "SELECT id, nome_completo, username, perfil FROM usuarios WHERE perfil IN ('gerente', 'administrador') ORDER BY nome_completo";
+
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Usuario usuario = new Usuario();
+                usuario.setId(rs.getInt("id"));
+                usuario.setNomeCompleto(rs.getString("nome_completo"));
+                usuario.setUsername(rs.getString("username"));
+                usuario.setPerfil(rs.getString("perfil"));
+                gerentes.add(usuario);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao buscar gerentes: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return gerentes;
+    }
+
+    /**
      * Exclui um usuário do banco de dados pelo ID.
      * @param id O ID do usuário a ser excluído.
      */

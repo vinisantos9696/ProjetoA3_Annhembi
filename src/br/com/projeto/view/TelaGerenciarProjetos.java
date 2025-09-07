@@ -19,6 +19,7 @@ public class TelaGerenciarProjetos extends JFrame {
     private JTable tabelaProjetos;
     private DefaultTableModel tableModel;
     private final ProjetoDAO projetoDAO;
+    private List<Projeto> projetosAtuais; // Lista para manter os projetos carregados
 
     private final JButton btnNovo;
     private final JButton btnEditar;
@@ -45,9 +46,14 @@ public class TelaGerenciarProjetos extends JFrame {
 
         // --- Tabela de Projetos ---
         String[] colunas = {"ID", "Nome", "Status", "Data de Início", "Data de Fim", "Gerente"};
-        tableModel = new DefaultTableModel(colunas, 0);
+        tableModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Torna todas as células não editáveis
+            }
+        };
         tabelaProjetos = new JTable(tableModel);
-        tabelaProjetos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION); // Apenas uma linha pode ser selecionada
+        tabelaProjetos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane scrollPane = new JScrollPane(tabelaProjetos);
 
@@ -55,7 +61,10 @@ public class TelaGerenciarProjetos extends JFrame {
         add(painelBotoes, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
-        // TODO: Adicionar ações para os botões de novo, editar e excluir.
+        // --- Ações dos Botões ---
+        btnNovo.addActionListener(e -> abrirFormulario(null));
+        btnEditar.addActionListener(e -> abrirFormulario(getProjetoSelecionado()));
+        btnExcluir.addActionListener(e -> excluirProjeto());
 
         // Carrega os dados iniciais e aplica as permissões
         carregarProjetos();
@@ -78,13 +87,10 @@ public class TelaGerenciarProjetos extends JFrame {
      * Carrega a lista de projetos do banco de dados e atualiza a tabela.
      */
     private void carregarProjetos() {
-        // Limpa a tabela atual
         tableModel.setRowCount(0);
+        this.projetosAtuais = projetoDAO.buscarTodosParaRelatorio();
 
-        // Reutiliza o método do DAO que busca todos os projetos para o relatório
-        List<Projeto> projetos = projetoDAO.buscarTodosParaRelatorio();
-
-        for (Projeto projeto : projetos) {
+        for (Projeto projeto : this.projetosAtuais) {
             Object[] rowData = {
                 projeto.getId(),
                 projeto.getNome(),
@@ -94,6 +100,59 @@ public class TelaGerenciarProjetos extends JFrame {
                 (projeto.getGerente() != null) ? projeto.getGerente().getNomeCompleto() : ""
             };
             tableModel.addRow(rowData);
+        }
+    }
+
+    /**
+     * Abre o formulário para criar um novo projeto ou editar um existente.
+     * @param projeto O projeto a ser editado, ou null para um novo projeto.
+     */
+    private void abrirFormulario(Projeto projeto) {
+        // Para o botão "Editar", verifica se um projeto foi selecionado
+        if (projeto == null && btnEditar.isFocusOwner()) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecione um projeto para editar.", "Nenhum Projeto Selecionado", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        TelaFormularioProjeto formulario = new TelaFormularioProjeto(this, projeto);
+        formulario.setVisible(true);
+
+        // Se o formulário foi salvo, atualiza a tabela
+        if (formulario.isSalvo()) {
+            carregarProjetos();
+        }
+    }
+
+    /**
+     * Pega o objeto Projeto correspondente à linha selecionada na tabela.
+     * @return O projeto selecionado, ou null se nenhuma linha for selecionada.
+     */
+    private Projeto getProjetoSelecionado() {
+        int selectedRow = tabelaProjetos.getSelectedRow();
+        if (selectedRow >= 0) {
+            return this.projetosAtuais.get(selectedRow);
+        }
+        return null;
+    }
+
+    /**
+     * Exclui o projeto selecionado na tabela após confirmação.
+     */
+    private void excluirProjeto() {
+        Projeto projeto = getProjetoSelecionado();
+        if (projeto != null) {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "Tem certeza que deseja excluir o projeto '" + projeto.getNome() + "'?",
+                "Confirmar Exclusão",
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                projetoDAO.excluir(projeto.getId());
+                carregarProjetos(); // Atualiza a tabela
+                JOptionPane.showMessageDialog(this, "Projeto excluído com sucesso!");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecione um projeto para excluir.", "Nenhum Projeto Selecionado", JOptionPane.WARNING_MESSAGE);
         }
     }
 }

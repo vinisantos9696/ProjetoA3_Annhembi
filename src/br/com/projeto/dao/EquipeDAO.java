@@ -147,4 +147,23 @@ public class EquipeDAO {
 
         return equipes;
     }
+
+    /**
+     * Exclui uma equipe do banco de dados pelo ID.
+     * @param id O ID da equipe a ser excluída.
+     */
+    public void excluir(int id) {
+        String sql = "DELETE FROM equipes WHERE id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+            System.out.println("Equipe excluída com sucesso!");
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao excluir equipe: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

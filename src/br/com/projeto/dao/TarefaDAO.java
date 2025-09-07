@@ -100,4 +100,23 @@ public class TarefaDAO {
 
         return tarefas;
     }
+
+    /**
+     * Exclui uma tarefa do banco de dados pelo ID.
+     * @param id O ID da tarefa a ser excluída.
+     */
+    public void excluir(int id) {
+        String sql = "DELETE FROM tarefas WHERE id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+            System.out.println("Tarefa excluída com sucesso!");
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao excluir tarefa: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

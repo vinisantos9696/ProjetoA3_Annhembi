@@ -89,5 +89,22 @@ public class ProjetoDAO {
         return projetos;
     }
 
-    // Outros métodos como buscarPorId, listarTodos, excluir podem ser adicionados aqui.
+    /**
+     * Exclui um projeto do banco de dados pelo ID.
+     * @param id O ID do projeto a ser excluído.
+     */
+    public void excluir(int id) {
+        String sql = "DELETE FROM projetos WHERE id = ?";
+        try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+            System.out.println("Projeto excluído com sucesso!");
+
+        } catch (SQLException e) {
+            System.err.println("Erro ao excluir projeto: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

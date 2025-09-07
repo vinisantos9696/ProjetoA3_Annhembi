@@ -18,6 +18,7 @@ public class TelaGerenciarTarefas extends JFrame {
     private JTable tabelaTarefas;
     private DefaultTableModel tableModel;
     private final TarefaDAO tarefaDAO;
+    private List<Tarefa> tarefasAtuais;
 
     private final JButton btnNova;
     private final JButton btnEditar;
@@ -44,7 +45,12 @@ public class TelaGerenciarTarefas extends JFrame {
 
         // --- Tabela de Tarefas ---
         String[] colunas = {"ID", "Descrição", "Status", "Projeto", "Responsável"};
-        tableModel = new DefaultTableModel(colunas, 0);
+        tableModel = new DefaultTableModel(colunas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         tabelaTarefas = new JTable(tableModel);
         tabelaTarefas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
@@ -54,7 +60,10 @@ public class TelaGerenciarTarefas extends JFrame {
         add(painelBotoes, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
-        // TODO: Adicionar ações para os botões de nova, editar e excluir.
+        // --- Ações dos Botões ---
+        btnNova.addActionListener(e -> abrirFormulario(null));
+        btnEditar.addActionListener(e -> abrirFormulario(getTarefaSelecionada()));
+        btnExcluir.addActionListener(e -> excluirTarefa());
 
         // Carrega os dados iniciais e aplica as permissões
         carregarTarefas();
@@ -77,12 +86,10 @@ public class TelaGerenciarTarefas extends JFrame {
      * Carrega a lista de tarefas do banco de dados e atualiza a tabela.
      */
     private void carregarTarefas() {
-        // Limpa a tabela atual
         tableModel.setRowCount(0);
-
-        List<Tarefa> tarefas = tarefaDAO.buscarTodas();
+        this.tarefasAtuais = tarefaDAO.buscarTodas();
         
-        for (Tarefa tarefa : tarefas) {
+        for (Tarefa tarefa : this.tarefasAtuais) {
             Object[] rowData = { 
                 tarefa.getId(), 
                 tarefa.getDescricao(), 
@@ -91,6 +98,58 @@ public class TelaGerenciarTarefas extends JFrame {
                 (tarefa.getResponsavel() != null) ? tarefa.getResponsavel().getNomeCompleto() : "N/A"
             };
             tableModel.addRow(rowData);
+        }
+    }
+
+    /**
+     * Abre o formulário para criar ou editar uma tarefa.
+     * @param tarefa A tarefa a ser editada, ou null para uma nova.
+     */
+    private void abrirFormulario(Tarefa tarefa) {
+        if (tarefa == null && btnEditar.isFocusOwner()) {
+            JOptionPane.showMessageDialog(this, "Por favor, selecione uma tarefa para editar.", "Nenhuma Tarefa Selecionada", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        TelaFormularioTarefa formulario = new TelaFormularioTarefa(this, tarefa);
+        formulario.setVisible(true);
+
+        if (formulario.isSalvo()) {
+            carregarTarefas();
+        }
+    }
+
+    /**
+     * Pega o objeto Tarefa correspondente à linha selecionada na tabela.
+     * @return A tarefa selecionada, ou null se nenhuma linha for selecionada.
+     */
+    private Tarefa getTarefaSelecionada() {
+        int selectedRow = tabelaTarefas.getSelectedRow();
+        if (selectedRow >= 0) {
+            int tarefaId = (int) tableModel.getValueAt(selectedRow, 0);
+            return tarefasAtuais.stream().filter(t -> t.getId() == tarefaId).findFirst().orElse(null);
+        }
+        return null;
+    }
+
+    /**
+     * Exclui a tarefa selecionada na tabela após confirmação.
+     */
+    private void excluirTarefa() {
+        Tarefa tarefa = getTarefaSelecionada();
+        if (tarefa != null) {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "Tem certeza que deseja excluir a tarefa: '" + tarefa.getDescricao() + "'?",
+                "Confirmar Exclusão",
+                JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                tarefaDAO.excluir(tarefa.getId());
+                carregarTarefas();
+                JOptionPane.showMessageDialog(this, "Tarefa excluída com sucesso!");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Por favor, selecione uma tarefa para excluir.", "Nenhuma Tarefa Selecionada", JOptionPane.WARNING_MESSAGE);
         }
     }
 }
