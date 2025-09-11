@@ -38,6 +38,10 @@ public class TelaFormularioTarefa extends JDialog {
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout());
 
+        // Configura a quebra de linha automática para a área de descrição
+        txtDescricao.setLineWrap(true);
+        txtDescricao.setWrapStyleWord(true);
+
         // --- Painel do Formulário ---
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -46,7 +50,13 @@ public class TelaFormularioTarefa extends JDialog {
 
         // Labels e Campos
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(new JLabel("Descrição:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 0; gbc.fill = GridBagConstraints.BOTH; formPanel.add(new JScrollPane(txtDescricao), gbc);
+        gbc.gridx = 1; gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        formPanel.add(new JScrollPane(txtDescricao), gbc);
+        gbc.weightx = 0.0; // Reseta os pesos
+        gbc.weighty = 0.0;
 
         gbc.gridx = 0; gbc.gridy = 1; gbc.fill = GridBagConstraints.NONE; formPanel.add(new JLabel("Status:"), gbc);
         cmbStatus = new JComboBox<>(new String[]{"Planejado", "Em Andamento", "Concluído"});

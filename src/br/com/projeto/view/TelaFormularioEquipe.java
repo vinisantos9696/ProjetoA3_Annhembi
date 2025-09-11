@@ -35,8 +35,15 @@ public class TelaFormularioEquipe extends JDialog {
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        gbc.gridx = 0; gbc.gridy = 0; formPanel.add(new JLabel("Nome da Equipe:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 0; gbc.fill = GridBagConstraints.HORIZONTAL; formPanel.add(txtNome, gbc);
+        // Label
+        gbc.gridx = 0; gbc.gridy = 0;
+        formPanel.add(new JLabel("Nome da Equipe:"), gbc);
+
+        // Campo de Texto
+        gbc.gridx = 1; gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0; // Permite que o campo de texto se expanda horizontalmente
+        formPanel.add(txtNome, gbc);
 
         add(formPanel, BorderLayout.CENTER);
 
