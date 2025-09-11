@@ -38,12 +38,12 @@ Siga estes passos para configurar e executar o projeto em sua máquina local.
 ### Pré-requisitos
 
 *   **Java Development Kit (JDK):** Versão 8 ou superior.
-*   **MySQL Server:** Versão 8 ou superior, com um usuário `root` configurado.
+*   **MySQL Server:** Versão 8 ou superior.
 *   **IDE Java:** IntelliJ IDEA, Eclipse ou outra de sua preferência.
 
-### Passo 1: Configurar a Senha do Banco de Dados
+### Passo 1: Configurar as Variáveis de Ambiente
 
-O sistema se conecta ao MySQL usando o usuário `root`. A única configuração manual necessária é informar a senha deste usuário para a aplicação através de uma variável de ambiente.
+A aplicação precisa saber o **usuário** e a **senha** do seu banco de dados MySQL. Isso é feito de forma segura através de variáveis de ambiente na sua IDE.
 
 **No IntelliJ IDEA:**
 
@@ -51,13 +51,14 @@ O sistema se conecta ao MySQL usando o usuário `root`. A única configuração 
 2.  No canto superior direito, clique no menu de configurações de execução e selecione **`Edit Configurations...`**.
 3.  Selecione a configuração de execução da sua classe `Main`.
 4.  Encontre o campo **`Environment variables`** e clique no ícone de pasta ou no botão `...` para abrir o editor.
-5.  Cole o texto abaixo, **substituindo `sua_senha_aqui` pela sua senha real do MySQL**.
+5.  Cole o texto abaixo, **substituindo `seu_usuario_mysql` e `sua_senha_aqui` pelos seus dados reais**.
 
     ```
-    DB_PASSWORD=sua_senha_aqui
+    DB_USER=seu_usuario_mysql;DB_PASSWORD=sua_senha_aqui
     ```
+    *Exemplo prático: `DB_USER=root;DB_PASSWORD=12345`*
 
-6.  Clique em **OK** para salvar a variável e depois em **Apply** e **OK** para fechar as configurações.
+6.  Clique em **OK** para salvar as variáveis e depois em **Apply** e **OK** para fechar as configurações.
 
 ### Passo 2: Executar o Projeto
 
