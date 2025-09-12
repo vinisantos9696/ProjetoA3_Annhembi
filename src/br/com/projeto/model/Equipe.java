@@ -4,8 +4,9 @@ import java.util.List;
 
 public class Equipe {
 
-    private int id;
-    private String nome;
+    private int idEquipe;
+    private String nomeEquipe;
+    private String descricao;
     private List<Usuario> membros;
     private List<Projeto> projetosAlocados;
 
@@ -13,29 +14,36 @@ public class Equipe {
     public Equipe() {
     }
 
-    // Construtor com todos os campos
-    public Equipe(int id, String nome, List<Usuario> membros, List<Projeto> projetosAlocados) {
-        this.id = id;
-        this.nome = nome;
-        this.membros = membros;
-        this.projetosAlocados = projetosAlocados;
+    // Construtor com campos principais
+    public Equipe(int idEquipe, String nomeEquipe, String descricao) {
+        this.idEquipe = idEquipe;
+        this.nomeEquipe = nomeEquipe;
+        this.descricao = descricao;
     }
 
     // Getters e Setters
-    public int getId() {
-        return id;
+    public int getIdEquipe() {
+        return idEquipe;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdEquipe(int idEquipe) {
+        this.idEquipe = idEquipe;
     }
 
-    public String getNome() {
-        return nome;
+    public String getNomeEquipe() {
+        return nomeEquipe;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setNomeEquipe(String nomeEquipe) {
+        this.nomeEquipe = nomeEquipe;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public List<Usuario> getMembros() {

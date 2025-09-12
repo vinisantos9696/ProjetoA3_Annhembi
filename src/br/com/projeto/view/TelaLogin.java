@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 
 public class TelaLogin extends JFrame {
 
-    private JTextField txtUsername;
+    private JTextField txtLogin;
     private JPasswordField txtPassword;
     private JButton btnLogin;
 
@@ -29,13 +29,13 @@ public class TelaLogin extends JFrame {
         // Label e campo de texto para o usuário
         gbc.gridx = 0;
         gbc.gridy = 0;
-        panel.add(new JLabel("Usuário:"), gbc);
+        panel.add(new JLabel("Login:"), gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.gridwidth = 2; // Ocupa duas colunas
-        txtUsername = new JTextField(20);
-        panel.add(txtUsername, gbc);
+        txtLogin = new JTextField(20);
+        panel.add(txtLogin, gbc);
 
         // Label e campo de texto para a senha
         gbc.gridx = 0;
@@ -67,19 +67,22 @@ public class TelaLogin extends JFrame {
                 realizarLogin();
             }
         });
+
+        // Define o botão de login como o padrão da janela (acionado com Enter)
+        this.getRootPane().setDefaultButton(btnLogin);
     }
 
     private void realizarLogin() {
-        String username = txtUsername.getText();
+        String login = txtLogin.getText();
         String password = new String(txtPassword.getPassword());
 
-        if (username.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Usuário e senha devem ser preenchidos.", "Erro de Login", JOptionPane.ERROR_MESSAGE);
+        if (login.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Login e senha devem ser preenchidos.", "Erro de Login", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         UsuarioDAO usuarioDAO = new UsuarioDAO();
-        Usuario usuarioLogado = usuarioDAO.fazerLogin(username, password);
+        Usuario usuarioLogado = usuarioDAO.fazerLogin(login, password);
 
         if (usuarioLogado != null) {
             // Abre a tela principal, passando o usuário que fez o login
@@ -89,7 +92,7 @@ public class TelaLogin extends JFrame {
             // Fecha a tela de login
             this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Usuário ou senha inválidos.", "Erro de Login", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Login ou senha inválidos.", "Erro de Login", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

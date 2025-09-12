@@ -41,7 +41,7 @@ public class TelaGerenciarUsuarios extends JFrame {
         painelBotoes.add(btnExcluir);
 
         // --- Tabela de Usuários ---
-        String[] colunas = {"ID", "Nome Completo", "Username", "Perfil"};
+        String[] colunas = {"ID", "Nome Completo", "Login", "Perfil"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -77,7 +77,7 @@ public class TelaGerenciarUsuarios extends JFrame {
             Object[] rowData = { 
                 usuario.getId(), 
                 usuario.getNomeCompleto(), 
-                usuario.getUsername(),
+                usuario.getLogin(),
                 usuario.getPerfil()
             };
             tableModel.addRow(rowData);

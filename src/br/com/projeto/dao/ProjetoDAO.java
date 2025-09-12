@@ -16,16 +16,16 @@ public class ProjetoDAO {
      */
     public void salvar(Projeto projeto) {
         String sql = (projeto.getId() == 0)
-            ? "INSERT INTO projetos (nome, descricao, data_inicio, data_fim, status, gerente_id) VALUES (?, ?, ?, ?, ?, ?)"
-            : "UPDATE projetos SET nome = ?, descricao = ?, data_inicio = ?, data_fim = ?, status = ?, gerente_id = ? WHERE id = ?";
+            ? "INSERT INTO projetos (nome_projeto, descricao, data_inicio, data_fim_prevista, status, id_gerente) VALUES (?, ?, ?, ?, ?, ?)"
+            : "UPDATE projetos SET nome_projeto = ?, descricao = ?, data_inicio = ?, data_fim_prevista = ?, status = ?, id_gerente = ? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, projeto.getNome());
+            pstmt.setString(1, projeto.getNomeProjeto());
             pstmt.setString(2, projeto.getDescricao());
             pstmt.setDate(3, new java.sql.Date(projeto.getDataInicio().getTime()));
-            pstmt.setDate(4, new java.sql.Date(projeto.getDataFim().getTime()));
+            pstmt.setDate(4, new java.sql.Date(projeto.getDataFimPrevista().getTime()));
             pstmt.setString(5, projeto.getStatus());
             
             if (projeto.getGerente() != null) {
@@ -54,7 +54,7 @@ public class ProjetoDAO {
     public List<Projeto> buscarTodosParaRelatorio() {
         List<Projeto> projetos = new ArrayList<>();
         // A consulta SQL une a tabela de projetos com a de usuários para buscar o nome do gerente.
-        String sql = "SELECT p.*, u.nome_completo AS gerente_nome FROM projetos p LEFT JOIN usuarios u ON p.gerente_id = u.id ORDER BY p.nome";
+        String sql = "SELECT p.*, u.nome_completo AS gerente_nome FROM projetos p LEFT JOIN usuarios u ON p.id_gerente = u.id ORDER BY p.nome_projeto";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -63,17 +63,17 @@ public class ProjetoDAO {
             while (rs.next()) {
                 Projeto projeto = new Projeto();
                 projeto.setId(rs.getInt("id"));
-                projeto.setNome(rs.getString("nome"));
+                projeto.setNomeProjeto(rs.getString("nome_projeto"));
                 projeto.setDescricao(rs.getString("descricao"));
                 projeto.setDataInicio(rs.getDate("data_inicio"));
-                projeto.setDataFim(rs.getDate("data_fim"));
+                projeto.setDataFimPrevista(rs.getDate("data_fim_prevista"));
                 projeto.setStatus(rs.getString("status"));
-                projeto.setGerenteId(rs.getInt("gerente_id"));
+                projeto.setIdGerente(rs.getInt("id_gerente"));
 
                 // Se houver um gerente associado, cria o objeto Usuario e o associa ao projeto.
-                if (rs.getInt("gerente_id") != 0) {
+                if (rs.getInt("id_gerente") != 0) {
                     Usuario gerente = new Usuario();
-                    gerente.setId(rs.getInt("gerente_id"));
+                    gerente.setId(rs.getInt("id_gerente"));
                     gerente.setNomeCompleto(rs.getString("gerente_nome"));
                     projeto.setGerente(gerente);
                 }

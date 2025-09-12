@@ -12,7 +12,7 @@ import java.awt.*;
 public class TelaFormularioUsuario extends JDialog {
 
     private final JTextField txtNomeCompleto = new JTextField(30);
-    private final JTextField txtUsername = new JTextField(30);
+    private final JTextField txtLogin = new JTextField(30);
     private final JPasswordField txtSenha = new JPasswordField(30);
     private final JComboBox<String> cmbPerfil;
 
@@ -43,8 +43,8 @@ public class TelaFormularioUsuario extends JDialog {
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(new JLabel("Nome Completo:"), gbc);
         gbc.gridx = 1; gbc.gridy = 0; gbc.fill = GridBagConstraints.HORIZONTAL; formPanel.add(txtNomeCompleto, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1; formPanel.add(new JLabel("Username:"), gbc);
-        gbc.gridx = 1; gbc.gridy = 1; formPanel.add(txtUsername, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; formPanel.add(new JLabel("Login:"), gbc);
+        gbc.gridx = 1; gbc.gridy = 1; formPanel.add(txtLogin, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2; formPanel.add(new JLabel("Senha:"), gbc);
         gbc.gridx = 1; gbc.gridy = 2; formPanel.add(txtSenha, gbc);
@@ -71,15 +71,15 @@ public class TelaFormularioUsuario extends JDialog {
     private void preencherFormulario() {
         if (usuario != null) {
             txtNomeCompleto.setText(usuario.getNomeCompleto());
-            txtUsername.setText(usuario.getUsername());
+            txtLogin.setText(usuario.getLogin());
             cmbPerfil.setSelectedItem(usuario.getPerfil());
             // A senha não é preenchida por segurança
         }
     }
 
     private void salvarUsuario() {
-        if (txtNomeCompleto.getText().trim().isEmpty() || txtUsername.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Nome completo e username são obrigatórios.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+        if (txtNomeCompleto.getText().trim().isEmpty() || txtLogin.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nome completo e login são obrigatórios.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
         
@@ -94,7 +94,7 @@ public class TelaFormularioUsuario extends JDialog {
         }
 
         usuario.setNomeCompleto(txtNomeCompleto.getText().trim());
-        usuario.setUsername(txtUsername.getText().trim());
+        usuario.setLogin(txtLogin.getText().trim());
         usuario.setPerfil((String) cmbPerfil.getSelectedItem());
         
         // Atualiza a senha apenas se uma nova for digitada

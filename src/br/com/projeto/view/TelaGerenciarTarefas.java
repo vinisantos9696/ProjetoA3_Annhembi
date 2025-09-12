@@ -44,7 +44,7 @@ public class TelaGerenciarTarefas extends JFrame {
         painelBotoes.add(btnExcluir);
 
         // --- Tabela de Tarefas ---
-        String[] colunas = {"ID", "Descrição", "Status", "Projeto", "Responsável"};
+        String[] colunas = {"ID", "Título", "Status", "Projeto", "Responsável"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -92,9 +92,9 @@ public class TelaGerenciarTarefas extends JFrame {
         for (Tarefa tarefa : this.tarefasAtuais) {
             Object[] rowData = { 
                 tarefa.getId(), 
-                tarefa.getDescricao(), 
+                tarefa.getTitulo(), 
                 tarefa.getStatus(),
-                (tarefa.getProjeto() != null) ? tarefa.getProjeto().getNome() : "N/A",
+                (tarefa.getProjeto() != null) ? tarefa.getProjeto().getNomeProjeto() : "N/A",
                 (tarefa.getResponsavel() != null) ? tarefa.getResponsavel().getNomeCompleto() : "N/A"
             };
             tableModel.addRow(rowData);
@@ -139,7 +139,7 @@ public class TelaGerenciarTarefas extends JFrame {
         Tarefa tarefa = getTarefaSelecionada();
         if (tarefa != null) {
             int confirm = JOptionPane.showConfirmDialog(this,
-                "Tem certeza que deseja excluir a tarefa: '" + tarefa.getDescricao() + "'?",
+                "Tem certeza que deseja excluir a tarefa: '" + tarefa.getTitulo() + "'?",
                 "Confirmar Exclusão",
                 JOptionPane.YES_NO_OPTION);
 

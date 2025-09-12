@@ -17,29 +17,30 @@ public class TarefaDAO {
      */
     public void salvar(Tarefa tarefa) {
         String sql = (tarefa.getId() == 0)
-            ? "INSERT INTO tarefas (descricao, status, projeto_id, responsavel_id) VALUES (?, ?, ?, ?)"
-            : "UPDATE tarefas SET descricao = ?, status = ?, projeto_id = ?, responsavel_id = ? WHERE id = ?";
+            ? "INSERT INTO tarefas (titulo, descricao, status, id_projeto, id_responsavel) VALUES (?, ?, ?, ?, ?)"
+            : "UPDATE tarefas SET titulo = ?, descricao = ?, status = ?, id_projeto = ?, id_responsavel = ? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, tarefa.getDescricao());
-            pstmt.setString(2, tarefa.getStatus());
+            pstmt.setString(1, tarefa.getTitulo());
+            pstmt.setString(2, tarefa.getDescricao());
+            pstmt.setString(3, tarefa.getStatus());
 
             if (tarefa.getProjeto() != null) {
-                pstmt.setInt(3, tarefa.getProjeto().getId());
-            } else {
-                pstmt.setNull(3, Types.INTEGER);
-            }
-
-            if (tarefa.getResponsavel() != null) {
-                pstmt.setInt(4, tarefa.getResponsavel().getId());
+                pstmt.setInt(4, tarefa.getProjeto().getId());
             } else {
                 pstmt.setNull(4, Types.INTEGER);
             }
 
+            if (tarefa.getResponsavel() != null) {
+                pstmt.setInt(5, tarefa.getResponsavel().getId());
+            } else {
+                pstmt.setNull(5, Types.INTEGER);
+            }
+
             if (tarefa.getId() != 0) {
-                pstmt.setInt(5, tarefa.getId());
+                pstmt.setInt(6, tarefa.getId());
             }
 
             pstmt.executeUpdate();
@@ -57,12 +58,12 @@ public class TarefaDAO {
      */
     public List<Tarefa> buscarTodas() {
         List<Tarefa> tarefas = new ArrayList<>();
-        String sql = "SELECT t.id, t.descricao, t.status, " +
-                     "p.id AS projeto_id, p.nome AS projeto_nome, " +
+        String sql = "SELECT t.id, t.titulo, t.descricao, t.status, " +
+                     "p.id AS projeto_id, p.nome_projeto AS projeto_nome, " +
                      "u.id AS responsavel_id, u.nome_completo AS responsavel_nome " +
                      "FROM tarefas t " +
-                     "LEFT JOIN projetos p ON t.projeto_id = p.id " +
-                     "LEFT JOIN usuarios u ON t.responsavel_id = u.id " +
+                     "LEFT JOIN projetos p ON t.id_projeto = p.id " +
+                     "LEFT JOIN usuarios u ON t.id_responsavel = u.id " +
                      "ORDER BY t.id";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
@@ -72,6 +73,7 @@ public class TarefaDAO {
             while (rs.next()) {
                 Tarefa tarefa = new Tarefa();
                 tarefa.setId(rs.getInt("id"));
+                tarefa.setTitulo(rs.getString("titulo"));
                 tarefa.setDescricao(rs.getString("descricao"));
                 tarefa.setStatus(rs.getString("status"));
 
@@ -79,7 +81,7 @@ public class TarefaDAO {
                 if (rs.getObject("projeto_id") != null) {
                     Projeto projeto = new Projeto();
                     projeto.setId(rs.getInt("projeto_id"));
-                    projeto.setNome(rs.getString("projeto_nome"));
+                    projeto.setNomeProjeto(rs.getString("projeto_nome"));
                     tarefa.setProjeto(projeto);
                 }
 

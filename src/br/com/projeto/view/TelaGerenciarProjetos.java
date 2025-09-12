@@ -45,7 +45,7 @@ public class TelaGerenciarProjetos extends JFrame {
         painelBotoes.add(btnExcluir);
 
         // --- Tabela de Projetos ---
-        String[] colunas = {"ID", "Nome", "Status", "Data de Início", "Data de Fim", "Gerente"};
+        String[] colunas = {"ID", "Nome do Projeto", "Status", "Data de Início", "Data Prev. Fim", "Gerente"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -93,10 +93,10 @@ public class TelaGerenciarProjetos extends JFrame {
         for (Projeto projeto : this.projetosAtuais) {
             Object[] rowData = {
                 projeto.getId(),
-                projeto.getNome(),
+                projeto.getNomeProjeto(),
                 projeto.getStatus(),
                 projeto.getDataInicio(),
-                projeto.getDataFim(),
+                projeto.getDataFimPrevista(),
                 (projeto.getGerente() != null) ? projeto.getGerente().getNomeCompleto() : ""
             };
             tableModel.addRow(rowData);
@@ -130,7 +130,8 @@ public class TelaGerenciarProjetos extends JFrame {
     private Projeto getProjetoSelecionado() {
         int selectedRow = tabelaProjetos.getSelectedRow();
         if (selectedRow >= 0) {
-            return this.projetosAtuais.get(selectedRow);
+            int projetoId = (int) tableModel.getValueAt(selectedRow, 0);
+            return projetosAtuais.stream().filter(p -> p.getId() == projetoId).findFirst().orElse(null);
         }
         return null;
     }
@@ -142,7 +143,7 @@ public class TelaGerenciarProjetos extends JFrame {
         Projeto projeto = getProjetoSelecionado();
         if (projeto != null) {
             int confirm = JOptionPane.showConfirmDialog(this,
-                "Tem certeza que deseja excluir o projeto '" + projeto.getNome() + "'?",
+                "Tem certeza que deseja excluir o projeto '" + projeto.getNomeProjeto() + "'?",
                 "Confirmar Exclusão",
                 JOptionPane.YES_NO_OPTION);
 

@@ -1,10 +1,12 @@
 package br.com.projeto.model;
 
+import java.util.Objects;
+
 public class Usuario {
 
     private int id;
     private String nomeCompleto;
-    private String username;
+    private String login;
     private String senha;
     private String perfil; // "administrador", "gerente", "colaborador"
 
@@ -13,10 +15,10 @@ public class Usuario {
     }
 
     // Construtor com todos os campos
-    public Usuario(int id, String nomeCompleto, String username, String senha, String perfil) {
+    public Usuario(int id, String nomeCompleto, String login, String senha, String perfil) {
         this.id = id;
         this.nomeCompleto = nomeCompleto;
-        this.username = username;
+        this.login = login;
         this.senha = senha;
         this.perfil = perfil;
     }
@@ -38,12 +40,12 @@ public class Usuario {
         this.nomeCompleto = nomeCompleto;
     }
 
-    public String getUsername() {
-        return username;
+    public String getLogin() {
+        return login;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getSenha() {
@@ -60,5 +62,18 @@ public class Usuario {
 
     public void setPerfil(String perfil) {
         this.perfil = perfil;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Usuario usuario = (Usuario) o;
+        return id == usuario.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

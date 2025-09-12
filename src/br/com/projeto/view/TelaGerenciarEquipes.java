@@ -29,7 +29,7 @@ public class TelaGerenciarEquipes extends JFrame {
         this.equipeDAO = new EquipeDAO();
 
         setTitle("Gerenciamento de Equipes");
-        setSize(600, 400);
+        setSize(800, 400);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -44,7 +44,7 @@ public class TelaGerenciarEquipes extends JFrame {
         painelBotoes.add(btnExcluir);
 
         // --- Tabela de Equipes ---
-        String[] colunas = {"ID", "Nome da Equipe"};
+        String[] colunas = {"ID", "Nome da Equipe", "Descrição"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -62,7 +62,14 @@ public class TelaGerenciarEquipes extends JFrame {
 
         // --- Ações dos Botões ---
         btnNova.addActionListener(e -> abrirFormulario(null));
-        btnEditar.addActionListener(e -> abrirFormulario(getEquipeSelecionada()));
+        btnEditar.addActionListener(e -> {
+            Equipe equipeSelecionada = getEquipeSelecionada();
+            if (equipeSelecionada != null) {
+                abrirFormulario(equipeSelecionada);
+            } else {
+                JOptionPane.showMessageDialog(this, "Por favor, selecione uma equipe para editar.", "Nenhuma Equipe Selecionada", JOptionPane.WARNING_MESSAGE);
+            }
+        });
         btnExcluir.addActionListener(e -> excluirEquipe());
 
         // Carrega os dados iniciais e aplica as permissões
@@ -70,9 +77,6 @@ public class TelaGerenciarEquipes extends JFrame {
         configurarPermissoes();
     }
 
-    /**
-     * Habilita ou desabilita os botões de gerenciamento com base no perfil do usuário.
-     */
     private void configurarPermissoes() {
         String perfil = usuarioLogado.getPerfil();
         boolean podeGerenciar = "administrador".equalsIgnoreCase(perfil) || "gerente".equalsIgnoreCase(perfil);
@@ -82,29 +86,17 @@ public class TelaGerenciarEquipes extends JFrame {
         btnExcluir.setEnabled(podeGerenciar);
     }
 
-    /**
-     * Carrega a lista de equipes do banco de dados e atualiza a tabela.
-     */
     private void carregarEquipes() {
         tableModel.setRowCount(0);
         this.equipesAtuais = equipeDAO.buscarTodas();
         
         for (Equipe equipe : this.equipesAtuais) {
-            Object[] rowData = { equipe.getId(), equipe.getNome() };
+            Object[] rowData = { equipe.getIdEquipe(), equipe.getNomeEquipe(), equipe.getDescricao() };
             tableModel.addRow(rowData);
         }
     }
 
-    /**
-     * Abre o formulário para criar ou editar uma equipe.
-     * @param equipe A equipe a ser editada, ou null para uma nova.
-     */
     private void abrirFormulario(Equipe equipe) {
-        if (equipe == null && btnEditar.isFocusOwner()) {
-            JOptionPane.showMessageDialog(this, "Por favor, selecione uma equipe para editar.", "Nenhuma Equipe Selecionada", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
         TelaFormularioEquipe formulario = new TelaFormularioEquipe(this, equipe);
         formulario.setVisible(true);
 
@@ -113,33 +105,29 @@ public class TelaGerenciarEquipes extends JFrame {
         }
     }
 
-    /**
-     * Pega o objeto Equipe correspondente à linha selecionada na tabela.
-     * @return A equipe selecionada, ou null se nenhuma linha for selecionada.
-     */
     private Equipe getEquipeSelecionada() {
         int selectedRow = tabelaEquipes.getSelectedRow();
         if (selectedRow >= 0) {
             int equipeId = (int) tableModel.getValueAt(selectedRow, 0);
-            // Encontra a equipe na lista local para garantir que o objeto esteja completo
-            return equipesAtuais.stream().filter(e -> e.getId() == equipeId).findFirst().orElse(null);
+            // Usa o método buscarPorId para carregar o objeto completo com membros e projetos
+            return equipeDAO.buscarPorId(equipeId);
         }
         return null;
     }
 
-    /**
-     * Exclui a equipe selecionada na tabela após confirmação.
-     */
     private void excluirEquipe() {
-        Equipe equipe = getEquipeSelecionada();
-        if (equipe != null) {
+        int selectedRow = tabelaEquipes.getSelectedRow();
+        if (selectedRow >= 0) {
+            int equipeId = (int) tableModel.getValueAt(selectedRow, 0);
+            String nomeEquipe = (String) tableModel.getValueAt(selectedRow, 1);
+
             int confirm = JOptionPane.showConfirmDialog(this,
-                "Tem certeza que deseja excluir a equipe '" + equipe.getNome() + "'?",
+                "Tem certeza que deseja excluir a equipe '" + nomeEquipe + "'?",
                 "Confirmar Exclusão",
                 JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                equipeDAO.excluir(equipe.getId());
+                equipeDAO.excluir(equipeId);
                 carregarEquipes();
                 JOptionPane.showMessageDialog(this, "Equipe excluída com sucesso!");
             }

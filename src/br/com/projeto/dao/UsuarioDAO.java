@@ -12,16 +12,16 @@ public class UsuarioDAO {
 
     /**
      * Valida as credenciais do usuário no banco de dados.
-     * @param username O nome de usuário.
+     * @param login O nome de usuário.
      * @param senha A senha.
      * @return Um objeto Usuario se as credenciais forem válidas, caso contrário, null.
      */
-    public Usuario fazerLogin(String username, String senha) {
-        String sql = "SELECT * FROM usuarios WHERE username = ? AND senha = ?";
+    public Usuario fazerLogin(String login, String senha) {
+        String sql = "SELECT * FROM usuarios WHERE login = ? AND senha = ?";
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, username);
+            pstmt.setString(1, login);
             pstmt.setString(2, senha);
 
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -29,7 +29,7 @@ public class UsuarioDAO {
                     return new Usuario(
                         rs.getInt("id"),
                         rs.getString("nome_completo"),
-                        rs.getString("username"),
+                        rs.getString("login"),
                         rs.getString("senha"),
                         rs.getString("perfil")
                     );
@@ -48,14 +48,14 @@ public class UsuarioDAO {
      */
     public void salvar(Usuario usuario) {
         String sql = (usuario.getId() == 0)
-            ? "INSERT INTO usuarios (nome_completo, username, senha, perfil) VALUES (?, ?, ?, ?)"
-            : "UPDATE usuarios SET nome_completo = ?, username = ?, senha = ?, perfil = ? WHERE id = ?";
+            ? "INSERT INTO usuarios (nome_completo, login, senha, perfil) VALUES (?, ?, ?, ?)"
+            : "UPDATE usuarios SET nome_completo = ?, login = ?, senha = ?, perfil = ? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, usuario.getNomeCompleto());
-            pstmt.setString(2, usuario.getUsername());
+            pstmt.setString(2, usuario.getLogin());
             pstmt.setString(3, usuario.getSenha());
             pstmt.setString(4, usuario.getPerfil());
 
@@ -78,7 +78,7 @@ public class UsuarioDAO {
      */
     public List<Usuario> buscarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT id, nome_completo, username, perfil FROM usuarios ORDER BY nome_completo";
+        String sql = "SELECT id, nome_completo, login, perfil FROM usuarios ORDER BY nome_completo";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -88,7 +88,7 @@ public class UsuarioDAO {
                 Usuario usuario = new Usuario();
                 usuario.setId(rs.getInt("id"));
                 usuario.setNomeCompleto(rs.getString("nome_completo"));
-                usuario.setUsername(rs.getString("username"));
+                usuario.setLogin(rs.getString("login"));
                 usuario.setPerfil(rs.getString("perfil"));
                 usuarios.add(usuario);
             }
@@ -105,7 +105,7 @@ public class UsuarioDAO {
      */
     public List<Usuario> buscarGerentes() {
         List<Usuario> gerentes = new ArrayList<>();
-        String sql = "SELECT id, nome_completo, username, perfil FROM usuarios WHERE perfil IN ('gerente', 'administrador') ORDER BY nome_completo";
+        String sql = "SELECT id, nome_completo, login, perfil FROM usuarios WHERE perfil IN ('gerente', 'administrador') ORDER BY nome_completo";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -115,7 +115,7 @@ public class UsuarioDAO {
                 Usuario usuario = new Usuario();
                 usuario.setId(rs.getInt("id"));
                 usuario.setNomeCompleto(rs.getString("nome_completo"));
-                usuario.setUsername(rs.getString("username"));
+                usuario.setLogin(rs.getString("login"));
                 usuario.setPerfil(rs.getString("perfil"));
                 gerentes.add(usuario);
             }

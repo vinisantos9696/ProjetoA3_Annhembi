@@ -1,16 +1,17 @@
 package br.com.projeto.model;
 
 import java.util.Date;
+import java.util.Objects;
 
 public class Projeto {
 
     private int id;
-    private String nome;
+    private String nomeProjeto;
     private String descricao;
     private Date dataInicio;
-    private Date dataFim;
+    private Date dataFimPrevista;
     private String status; // Ex: "Em andamento", "Concluído", "Pendente"
-    private int gerenteId; // ID do gerente, para facilitar o acesso ao banco
+    private int idGerente; // ID do gerente, para facilitar o acesso ao banco
     private Usuario gerente; // Referência ao objeto gerente completo
 
     // Construtor Padrão
@@ -18,16 +19,16 @@ public class Projeto {
     }
 
     // Construtor com todos os campos
-    public Projeto(int id, String nome, String descricao, Date dataInicio, Date dataFim, String status, Usuario gerente) {
+    public Projeto(int id, String nomeProjeto, String descricao, Date dataInicio, Date dataFimPrevista, String status, Usuario gerente) {
         this.id = id;
-        this.nome = nome;
+        this.nomeProjeto = nomeProjeto;
         this.descricao = descricao;
         this.dataInicio = dataInicio;
-        this.dataFim = dataFim;
+        this.dataFimPrevista = dataFimPrevista;
         this.status = status;
         this.gerente = gerente;
         if (gerente != null) {
-            this.gerenteId = gerente.getId();
+            this.idGerente = gerente.getId();
         }
     }
 
@@ -40,12 +41,12 @@ public class Projeto {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getNomeProjeto() {
+        return nomeProjeto;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setNomeProjeto(String nomeProjeto) {
+        this.nomeProjeto = nomeProjeto;
     }
 
     public String getDescricao() {
@@ -64,12 +65,12 @@ public class Projeto {
         this.dataInicio = dataInicio;
     }
 
-    public Date getDataFim() {
-        return dataFim;
+    public Date getDataFimPrevista() {
+        return dataFimPrevista;
     }
 
-    public void setDataFim(Date dataFim) {
-        this.dataFim = dataFim;
+    public void setDataFimPrevista(Date dataFimPrevista) {
+        this.dataFimPrevista = dataFimPrevista;
     }
 
     public String getStatus() {
@@ -80,12 +81,12 @@ public class Projeto {
         this.status = status;
     }
 
-    public int getGerenteId() {
-        return gerenteId;
+    public int getIdGerente() {
+        return idGerente;
     }
 
-    public void setGerenteId(int gerenteId) {
-        this.gerenteId = gerenteId;
+    public void setIdGerente(int idGerente) {
+        this.idGerente = idGerente;
     }
 
     public Usuario getGerente() {
@@ -94,5 +95,18 @@ public class Projeto {
 
     public void setGerente(Usuario gerente) {
         this.gerente = gerente;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Projeto projeto = (Projeto) o;
+        return id == projeto.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

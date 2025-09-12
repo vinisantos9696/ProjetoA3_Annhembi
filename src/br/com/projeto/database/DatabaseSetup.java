@@ -78,20 +78,27 @@ public class DatabaseSetup {
                     throw new IOException("Arquivo 'schema.sql' não encontrado no classpath.");
                 }
 
-                // Implementação robusta para executar o script
-                StringBuilder sqlStatement = new StringBuilder();
+                // Leitura do script para uma única string
+                String script;
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+                    StringBuilder sb = new StringBuilder();
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        line = line.trim();
-                        if (line.isEmpty() || line.startsWith("--")) {
-                            continue;
-                        }
-                        sqlStatement.append(line);
-                        if (line.endsWith(";")) {
-                            stmt.execute(sqlStatement.toString());
-                            sqlStatement.setLength(0);
-                        }
+                        sb.append(line).append(System.lineSeparator());
+                    }
+                    script = sb.toString();
+                }
+
+                // Divide o script em instruções individuais pelo ponto e vírgula
+                String[] individualStatements = script.split(";");
+
+                for (String statement : individualStatements) {
+                    // Remove comentários e apara espaços
+                    String cleanedStatement = statement.replaceAll("--.*", "").replaceAll("/\\*[\\s\\S]*?\\*/", "").trim();
+                    
+                    // Executa a instrução se não estiver vazia
+                    if (!cleanedStatement.isEmpty()) {
+                        stmt.execute(cleanedStatement);
                     }
                 }
             }
