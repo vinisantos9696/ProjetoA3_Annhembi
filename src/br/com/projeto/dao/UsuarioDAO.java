@@ -40,9 +40,23 @@ public class UsuarioDAO {
     }
 
     public void salvar(Usuario usuario) {
-        String sql = (usuario.getId() == 0)
-            ? "INSERT INTO usuarios (nome_completo, cpf, email, cargo, login, senha, perfil) VALUES (?, ?, ?, ?, ?, ?, ?)"
-            : "UPDATE usuarios SET nome_completo = ?, cpf = ?, email = ?, cargo = ?, login = ?, senha = ?, perfil = ? WHERE id = ?";
+        String sql;
+        boolean isUpdate = usuario.getId() != 0;
+        boolean senhaFornecida = usuario.getSenha() != null && !usuario.getSenha().trim().isEmpty();
+
+        if (!isUpdate) {
+            // INSERT para novo usuário
+            sql = "INSERT INTO usuarios (nome_completo, cpf, email, cargo, login, senha, perfil) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        } else {
+            // UPDATE para usuário existente
+            if (senhaFornecida) {
+                // Atualiza tudo, incluindo a senha
+                sql = "UPDATE usuarios SET nome_completo = ?, cpf = ?, email = ?, cargo = ?, login = ?, senha = ?, perfil = ? WHERE id = ?";
+            } else {
+                // Atualiza tudo, EXCETO a senha
+                sql = "UPDATE usuarios SET nome_completo = ?, cpf = ?, email = ?, cargo = ?, login = ?, perfil = ? WHERE id = ?";
+            }
+        }
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -52,11 +66,19 @@ public class UsuarioDAO {
             pstmt.setString(3, usuario.getEmail());
             pstmt.setString(4, usuario.getCargo());
             pstmt.setString(5, usuario.getLogin());
-            pstmt.setString(6, usuario.getSenha());
-            pstmt.setString(7, usuario.getPerfil());
 
-            if (usuario.getId() != 0) {
-                pstmt.setInt(8, usuario.getId());
+            if (!isUpdate) { // INSERT
+                pstmt.setString(6, usuario.getSenha());
+                pstmt.setString(7, usuario.getPerfil());
+            } else { // UPDATE
+                if (senhaFornecida) {
+                    pstmt.setString(6, usuario.getSenha());
+                    pstmt.setString(7, usuario.getPerfil());
+                    pstmt.setInt(8, usuario.getId());
+                } else {
+                    pstmt.setString(6, usuario.getPerfil());
+                    pstmt.setInt(7, usuario.getId());
+                }
             }
 
             pstmt.executeUpdate();

@@ -17,6 +17,7 @@ public class TelaFormularioUsuario extends JDialog {
     private final JTextField txtCargo = new JTextField(30);
     private final JTextField txtLogin = new JTextField(30);
     private final JPasswordField txtSenha = new JPasswordField(30);
+    private final JLabel lblSenha;
     private final JComboBox<String> cmbPerfil;
 
     private final JButton btnSalvar = new JButton("Salvar");
@@ -32,7 +33,7 @@ public class TelaFormularioUsuario extends JDialog {
         this.usuarioDAO = new UsuarioDAO();
 
         setTitle(usuario == null ? "Novo Usuário" : "Editar Usuário");
-        setSize(500, 400); // Aumentar tamanho para novos campos
+        setSize(500, 430); // Altura ajustada para o novo label
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout());
 
@@ -59,7 +60,9 @@ public class TelaFormularioUsuario extends JDialog {
         gbc.gridx = 0; gbc.gridy = 4; formPanel.add(new JLabel("Login:"), gbc);
         gbc.gridx = 1; gbc.gridy = 4; formPanel.add(txtLogin, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5; formPanel.add(new JLabel("Senha:"), gbc);
+        // Label da Senha (agora com referência)
+        lblSenha = new JLabel("Senha:");
+        gbc.gridx = 0; gbc.gridy = 5; formPanel.add(lblSenha, gbc);
         gbc.gridx = 1; gbc.gridy = 5; formPanel.add(txtSenha, gbc);
 
         gbc.gridx = 0; gbc.gridy = 6; formPanel.add(new JLabel("Perfil:"), gbc);
@@ -76,6 +79,11 @@ public class TelaFormularioUsuario extends JDialog {
 
         // --- Ações e Preenchimento ---
         preencherFormulario();
+
+        // Altera o label da senha se for uma edição
+        if (usuario != null) {
+            lblSenha.setText("<html>Nova Senha:<br>(deixe em branco para manter)</html>");
+        }
 
         btnCancelar.addActionListener(e -> dispose());
         btnSalvar.addActionListener(e -> salvarUsuario());
@@ -99,7 +107,8 @@ public class TelaFormularioUsuario extends JDialog {
             return;
         }
         
-        if (usuario == null && new String(txtSenha.getPassword()).trim().isEmpty()) {
+        String senha = new String(txtSenha.getPassword());
+        if (usuario == null && senha.trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A senha é obrigatória para novos usuários.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -115,10 +124,9 @@ public class TelaFormularioUsuario extends JDialog {
         usuario.setLogin(txtLogin.getText().trim());
         usuario.setPerfil((String) cmbPerfil.getSelectedItem());
         
-        String senha = new String(txtSenha.getPassword());
-        if (!senha.trim().isEmpty()) {
-            usuario.setSenha(senha);
-        }
+        // A lógica de quando atualizar a senha agora é do DAO. 
+        // A UI apenas passa o que foi digitado.
+        usuario.setSenha(senha);
 
         usuarioDAO.salvar(usuario);
 
