@@ -131,12 +131,6 @@ public class UsuarioDAO {
      * @param id O ID do usuário a ser excluído.
      */
     public void excluir(int id) {
-        // Regra de segurança: impede a exclusão do usuário administrador principal (ID=1)
-        if (id == 1) {
-            System.err.println("Não é permitido excluir o administrador principal.");
-            return;
-        }
-
         String sql = "DELETE FROM usuarios WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -165,7 +159,7 @@ public class UsuarioDAO {
                      "FROM " +
                      "    usuarios u " +
                      "LEFT JOIN " +
-                     "    tarefas t ON u.id = t.responsavel_id " +
+                     "    tarefas t ON u.id = t.id_responsavel " +
                      "GROUP BY " +
                      "    u.id, u.nome_completo " +
                      "ORDER BY " +

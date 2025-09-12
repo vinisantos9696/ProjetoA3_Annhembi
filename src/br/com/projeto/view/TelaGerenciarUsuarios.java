@@ -94,12 +94,6 @@ public class TelaGerenciarUsuarios extends JFrame {
             return;
         }
 
-        // Impede a edição do admin principal
-        if (usuario != null && usuario.getId() == 1 && btnEditar.isFocusOwner()) {
-            JOptionPane.showMessageDialog(this, "O administrador principal não pode ser editado.", "Ação Proibida", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
         TelaFormularioUsuario formulario = new TelaFormularioUsuario(this, usuario);
         formulario.setVisible(true);
 
@@ -127,11 +121,6 @@ public class TelaGerenciarUsuarios extends JFrame {
     private void excluirUsuario() {
         Usuario usuario = getUsuarioSelecionado();
         if (usuario != null) {
-            if (usuario.getId() == 1) {
-                JOptionPane.showMessageDialog(this, "O administrador principal não pode ser excluído.", "Ação Proibida", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
             int confirm = JOptionPane.showConfirmDialog(this, 
                 "Tem certeza que deseja excluir o usuário '" + usuario.getNomeCompleto() + "'?", 
                 "Confirmar Exclusão", 
