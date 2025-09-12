@@ -20,16 +20,16 @@ public class TelaFormularioUsuario extends JDialog {
     private final JButton btnCancelar = new JButton("Cancelar");
 
     private final UsuarioDAO usuarioDAO;
-    private Usuario usuario; // Nulo se for um novo usuário, preenchido se for edição
+    private Usuario usuario;
     private boolean salvo = false;
 
     public TelaFormularioUsuario(Frame owner, Usuario usuario) {
-        super(owner, true); // Diálogo modal
+        super(owner, true);
         this.usuario = usuario;
         this.usuarioDAO = new UsuarioDAO();
 
         setTitle(usuario == null ? "Novo Usuário" : "Editar Usuário");
-        setSize(450, 250);
+        setSize(450, 250); // Altura ajustada para menos um campo
         setLocationRelativeTo(owner);
         setLayout(new BorderLayout());
 
@@ -83,7 +83,6 @@ public class TelaFormularioUsuario extends JDialog {
             return;
         }
         
-        // Valida a senha apenas para novos usuários
         if (usuario == null && new String(txtSenha.getPassword()).trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "A senha é obrigatória para novos usuários.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
             return;
@@ -97,7 +96,6 @@ public class TelaFormularioUsuario extends JDialog {
         usuario.setLogin(txtLogin.getText().trim());
         usuario.setPerfil((String) cmbPerfil.getSelectedItem());
         
-        // Atualiza a senha apenas se uma nova for digitada
         String senha = new String(txtSenha.getPassword());
         if (!senha.trim().isEmpty()) {
             usuario.setSenha(senha);

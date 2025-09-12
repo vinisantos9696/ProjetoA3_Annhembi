@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome_completo VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NULL,
     login VARCHAR(50) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     perfil ENUM('administrador', 'gerente', 'colaborador') NOT NULL
@@ -62,14 +62,21 @@ CREATE TABLE IF NOT EXISTS projeto_equipes (
 
 -- Inserção de Dados de Exemplo --
 
--- Usuários (5 exemplos, incluindo os de teste)
-INSERT INTO usuarios (id, nome_completo, email, login, senha, perfil) VALUES
-(1, 'Administrador', 'admin@sistema.com', 'admin', 'admin', 'administrador'),
-(2, 'Gerente', 'gerente@sistema.com', 'gerente', 'gerente', 'gerente'),
-(3, 'Colaborador', 'colab@sistema.com', 'colab', 'colab', 'colaborador'),
-(4, 'Beatriz Lima', 'beatriz.lima@sistema.com', 'beatriz', 'bia123', 'colaborador'),
-(5, 'Davi Souza', 'davi.souza@sistema.com', 'davi', 'davi123', 'colaborador')
-ON DUPLICATE KEY UPDATE nome_completo=VALUES(nome_completo), email=VALUES(email), login=VALUES(login), senha=VALUES(senha), perfil=VALUES(perfil);
+-- Usuários (10 exemplos)
+INSERT INTO usuarios (id, nome_completo, login, senha, perfil) VALUES
+(1, 'Administrador', 'admin', 'admin', 'administrador'),
+(2, 'Gerente', 'gerente', 'gerente', 'gerente'),
+(3, 'Colaborador', 'colab', 'colab', 'colaborador'),
+(4, 'Beatriz Lima', 'beatriz', 'bia123', 'colaborador'),
+(5, 'Davi Souza', 'davi', 'davi123', 'colaborador'),
+(6, 'Fernanda Costa', 'fernanda', 'fer123', 'gerente'),
+(7, 'Ricardo Almeida', 'ricardo', 'rick123', 'gerente'),
+(8, 'Lucas Martins', 'lucas', 'lucas123', 'colaborador'),
+(9, 'Juliana Pereira', 'juliana', 'ju123', 'colaborador'),
+(10, 'Gabriel Rocha', 'gabriel', 'gabi123', 'colaborador'),
+(11, 'Mariana Barbosa', 'mariana', 'mari123', 'colaborador'),
+(12, 'Thiago Santos', 'thiago', 'thiago123', 'colaborador')
+ON DUPLICATE KEY UPDATE nome_completo=VALUES(nome_completo), login=VALUES(login), senha=VALUES(senha), perfil=VALUES(perfil);
 
 -- Equipes (5 exemplos)
 INSERT INTO equipes (id_equipe, nome_equipe, descricao) VALUES
@@ -82,37 +89,41 @@ ON DUPLICATE KEY UPDATE nome_equipe=VALUES(nome_equipe), descricao=VALUES(descri
 
 -- Membros das Equipes
 INSERT INTO equipe_membros (id_equipe, id_usuario) VALUES
-(1, 3),
-(1, 4),
-(2, 5),
-(3, 3),
-(4, 4)
+(1, 3), (1, 4), (1, 11), -- Equipe Alfa com Colaborador, Beatriz, Mariana
+(2, 5), (2, 8),          -- Equipe Beta com Davi, Lucas
+(3, 9),                 -- Equipe Gama com Juliana
+(4, 10),                -- Equipe Delta com Gabriel
+(5, 12)                 -- Equipe Ômega com Thiago
 ON DUPLICATE KEY UPDATE id_equipe=VALUES(id_equipe);
 
 -- Projetos (5 exemplos)
 INSERT INTO projetos (id, nome_projeto, descricao, data_inicio, data_fim_prevista, status, id_gerente) VALUES
 (1, 'Sistema de E-commerce B2C', 'Plataforma completa de vendas online para o consumidor final.', '2024-01-10', '2024-09-30', 'em andamento', 2),
-(2, 'Aplicativo de Gestão Financeira', 'App mobile para controle de despesas e receitas pessoais.', '2024-02-20', '2024-11-15', 'em andamento', 2),
+(2, 'Aplicativo de Gestão Financeira', 'App mobile para controle de despesas e receitas pessoais.', '2024-02-20', '2024-11-15', 'em andamento', 6),
 (3, 'Modernização do Legado (ERP)', 'Refatoração e migração do sistema ERP interno para novas tecnologias.', '2024-03-01', '2025-06-30', 'planejado', 1),
-(4, 'Plataforma de Análise de Dados', 'Ferramenta de BI para visualização de métricas de vendas.', '2024-04-15', '2024-12-20', 'planejado', 2),
-(5, 'Website Institucional com CMS', 'Desenvolvimento do novo site da empresa com um sistema de gerenciamento de conteúdo.', '2024-05-05', '2024-08-25', 'concluído', 1)
+(4, 'Plataforma de Análise de Dados', 'Ferramenta de BI para visualização de métricas de vendas.', '2024-04-15', '2024-12-20', 'planejado', 7),
+(5, 'Website Institucional com CMS', 'Desenvolvimento do novo site da empresa com um sistema de gerenciamento de conteúdo.', '2024-05-05', '2024-08-25', 'concluído', 6)
 ON DUPLICATE KEY UPDATE nome_projeto=VALUES(nome_projeto), descricao=VALUES(descricao), status=VALUES(status), id_gerente=VALUES(id_gerente);
 
 -- Associações de Equipes aos Projetos
 INSERT INTO projeto_equipes (id_projeto, id_equipe) VALUES
-(1, 1),
-(1, 2),
-(2, 3),
-(3, 2),
-(3, 5),
-(5, 1)
+(1, 1), (1, 2), -- E-commerce com Frontend e Backend
+(2, 3),         -- App Financeiro com Mobile
+(3, 2), (3, 5), -- ERP com Backend e DevOps
+(4, 2),         -- BI com Backend
+(5, 1)          -- Website com Frontend
 ON DUPLICATE KEY UPDATE id_projeto=VALUES(id_projeto);
 
--- Tarefas (5 exemplos)
+-- Tarefas (10 exemplos, para ter mais dados)
 INSERT INTO tarefas (id, titulo, descricao, id_projeto, id_responsavel, status, data_inicio, data_fim_prevista) VALUES
 (1, 'Desenvolver Carrinho de Compras', 'Implementar a funcionalidade completa do carrinho de compras no e-commerce.', 1, 3, 'em execução', '2024-05-10', '2024-06-10'),
-(2, 'Criar Tela de Login do App', 'Desenvolver a interface e a lógica de autenticação para o aplicativo financeiro.', 2, 3, 'pendente', '2024-05-15', '2024-06-05'),
-(3, 'Configurar Pipeline de CI/CD', 'Automatizar o processo de build e deploy para o projeto de modernização do ERP.', 3, 5, 'em execução', '2024-04-25', '2024-05-30'),
-(4, 'Testar API de Pagamentos', 'Criar e executar testes de integração para a API de pagamentos do e-commerce.', 1, 4, 'pendente', '2024-05-20', '2024-06-20'),
-(5, 'Migrar Banco de Dados de Clientes', 'Criar script para migrar os dados de clientes do sistema legado para o novo ERP.', 3, 5, 'concluída', '2024-04-01', '2024-04-30')
+(2, 'Criar Tela de Login do App', 'Desenvolver a interface e a lógica de autenticação para o aplicativo financeiro.', 2, 9, 'pendente', '2024-05-15', '2024-06-05'),
+(3, 'Configurar Pipeline de CI/CD', 'Automatizar o processo de build e deploy para o projeto de modernização do ERP.', 3, 12, 'em execução', '2024-04-25', '2024-05-30'),
+(4, 'Testar API de Pagamentos', 'Criar e executar testes de integração para a API de pagamentos do e-commerce.', 1, 10, 'pendente', '2024-05-20', '2024-06-20'),
+(5, 'Migrar Banco de Dados de Clientes', 'Criar script para migrar os dados de clientes do sistema legado para o novo ERP.', 3, 5, 'concluída', '2024-04-01', '2024-04-30'),
+(6, 'Modelar Dashboards de Vendas', 'Definir os principais KPIs e desenhar os dashboards para a plataforma de BI.', 4, 7, 'pendente', '2024-05-25', '2024-06-25'),
+(7, 'Criar Componente de Gráfico', 'Desenvolver um componente reutilizável de gráfico para o portal.', 1, 4, 'em execução', '2024-06-01', '2024-06-30'),
+(8, 'Implementar Notificações Push', 'Adicionar funcionalidade de notificações push no app financeiro.', 2, 9, 'pendente', '2024-06-10', '2024-07-10'),
+(9, 'Otimizar Consultas do Relatório', 'Analisar e otimizar o desempenho das consultas SQL na plataforma de BI.', 4, 8, 'pendente', '2024-06-15', '2024-07-15'),
+(10, 'Ajustar Layout para Blog', 'Adaptar o layout do novo website para incluir uma seção de blog.', 5, 11, 'concluída', '2024-06-01', '2024-06-20')
 ON DUPLICATE KEY UPDATE titulo=VALUES(titulo), descricao=VALUES(descricao), status=VALUES(status), id_responsavel=VALUES(id_responsavel);

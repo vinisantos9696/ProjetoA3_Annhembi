@@ -10,12 +10,6 @@ import java.util.List;
 
 public class UsuarioDAO {
 
-    /**
-     * Valida as credenciais do usuário no banco de dados.
-     * @param login O nome de usuário.
-     * @param senha A senha.
-     * @return Um objeto Usuario se as credenciais forem válidas, caso contrário, null.
-     */
     public Usuario fazerLogin(String login, String senha) {
         String sql = "SELECT * FROM usuarios WHERE login = ? AND senha = ?";
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
@@ -39,13 +33,9 @@ public class UsuarioDAO {
             System.err.println("Erro ao tentar fazer login: " + e.getMessage());
             e.printStackTrace();
         }
-        return null; // Retorna null se o login falhar
+        return null;
     }
 
-    /**
-     * Salva um novo usuário no banco de dados ou atualiza um existente.
-     * @param usuario O objeto Usuario a ser salvo.
-     */
     public void salvar(Usuario usuario) {
         String sql = (usuario.getId() == 0)
             ? "INSERT INTO usuarios (nome_completo, login, senha, perfil) VALUES (?, ?, ?, ?)"
@@ -72,10 +62,6 @@ public class UsuarioDAO {
         }
     }
 
-    /**
-     * Busca todos os usuários cadastrados, exceto a senha.
-     * @return Uma lista de objetos Usuario.
-     */
     public List<Usuario> buscarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
         String sql = "SELECT id, nome_completo, login, perfil FROM usuarios ORDER BY nome_completo";
@@ -99,10 +85,6 @@ public class UsuarioDAO {
         return usuarios;
     }
 
-    /**
-     * Busca todos os usuários que podem ser gerentes de projeto (perfis 'gerente' ou 'administrador').
-     * @return Uma lista de objetos Usuario que podem ser gerentes.
-     */
     public List<Usuario> buscarGerentes() {
         List<Usuario> gerentes = new ArrayList<>();
         String sql = "SELECT id, nome_completo, login, perfil FROM usuarios WHERE perfil IN ('gerente', 'administrador') ORDER BY nome_completo";
@@ -126,10 +108,6 @@ public class UsuarioDAO {
         return gerentes;
     }
 
-    /**
-     * Exclui um usuário do banco de dados pelo ID.
-     * @param id O ID do usuário a ser excluído.
-     */
     public void excluir(int id) {
         String sql = "DELETE FROM usuarios WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
@@ -145,10 +123,6 @@ public class UsuarioDAO {
         }
     }
 
-    /**
-     * Gera um relatório de desempenho de todos os colaboradores.
-     * @return Uma lista de DTOs com os dados de desempenho.
-     */
     public List<DesempenhoColaboradorDTO> gerarRelatorioDesempenho() {
         List<DesempenhoColaboradorDTO> relatorio = new ArrayList<>();
         String sql = "SELECT " +
