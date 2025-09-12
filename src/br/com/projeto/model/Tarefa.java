@@ -1,11 +1,17 @@
 package br.com.projeto.model;
 
+import java.util.Date;
+
 public class Tarefa {
 
     private int id;
     private String titulo;
     private String descricao;
     private String status; // Ex: "A fazer", "Em andamento", "Concluída"
+    private Date dataInicioPrevista;
+    private Date dataFimPrevista;
+    private Date dataInicioReal;
+    private Date dataFimReal;
     private Projeto projeto; // Projeto ao qual a tarefa pertence
     private Usuario responsavel; // Usuário responsável pela tarefa
 
@@ -14,11 +20,15 @@ public class Tarefa {
     }
 
     // Construtor com todos os campos
-    public Tarefa(int id, String titulo, String descricao, String status, Projeto projeto, Usuario responsavel) {
+    public Tarefa(int id, String titulo, String descricao, String status, Date dataInicioPrevista, Date dataFimPrevista, Date dataInicioReal, Date dataFimReal, Projeto projeto, Usuario responsavel) {
         this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
         this.status = status;
+        this.dataInicioPrevista = dataInicioPrevista;
+        this.dataFimPrevista = dataFimPrevista;
+        this.dataInicioReal = dataInicioReal;
+        this.dataFimReal = dataFimReal;
         this.projeto = projeto;
         this.responsavel = responsavel;
     }
@@ -54,6 +64,38 @@ public class Tarefa {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getDataInicioPrevista() {
+        return dataInicioPrevista;
+    }
+
+    public void setDataInicioPrevista(Date dataInicioPrevista) {
+        this.dataInicioPrevista = dataInicioPrevista;
+    }
+
+    public Date getDataFimPrevista() {
+        return dataFimPrevista;
+    }
+
+    public void setDataFimPrevista(Date dataFimPrevista) {
+        this.dataFimPrevista = dataFimPrevista;
+    }
+
+    public Date getDataInicioReal() {
+        return dataInicioReal;
+    }
+
+    public void setDataInicioReal(Date dataInicioReal) {
+        this.dataInicioReal = dataInicioReal;
+    }
+
+    public Date getDataFimReal() {
+        return dataFimReal;
+    }
+
+    public void setDataFimReal(Date dataFimReal) {
+        this.dataFimReal = dataFimReal;
     }
 
     public Projeto getProjeto() {

@@ -26,7 +26,7 @@ public class TelaGerenciarUsuarios extends JFrame {
         this.usuarioDAO = new UsuarioDAO();
 
         setTitle("Gerenciamento de Usuários");
-        setSize(800, 500);
+        setSize(1000, 600); // Aumentar o tamanho da janela
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -41,7 +41,7 @@ public class TelaGerenciarUsuarios extends JFrame {
         painelBotoes.add(btnExcluir);
 
         // --- Tabela de Usuários ---
-        String[] colunas = {"ID", "Nome Completo", "Login", "Perfil"};
+        String[] colunas = {"ID", "Nome Completo", "CPF", "E-mail", "Cargo", "Login", "Perfil"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -76,7 +76,10 @@ public class TelaGerenciarUsuarios extends JFrame {
         for (Usuario usuario : this.usuariosAtuais) {
             Object[] rowData = { 
                 usuario.getId(), 
-                usuario.getNomeCompleto(), 
+                usuario.getNomeCompleto(),
+                usuario.getCpf(),
+                usuario.getEmail(),
+                usuario.getCargo(),
                 usuario.getLogin(),
                 usuario.getPerfil()
             };

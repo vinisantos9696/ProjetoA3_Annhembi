@@ -17,8 +17,8 @@ public class TarefaDAO {
      */
     public void salvar(Tarefa tarefa) {
         String sql = (tarefa.getId() == 0)
-            ? "INSERT INTO tarefas (titulo, descricao, status, id_projeto, id_responsavel) VALUES (?, ?, ?, ?, ?)"
-            : "UPDATE tarefas SET titulo = ?, descricao = ?, status = ?, id_projeto = ?, id_responsavel = ? WHERE id = ?";
+            ? "INSERT INTO tarefas (titulo, descricao, status, data_inicio_prevista, data_fim_prevista, data_inicio_real, data_fim_real, id_projeto, id_responsavel) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
+            : "UPDATE tarefas SET titulo = ?, descricao = ?, status = ?, data_inicio_prevista = ?, data_fim_prevista = ?, data_inicio_real = ?, data_fim_real = ?, id_projeto = ?, id_responsavel = ? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -27,20 +27,26 @@ public class TarefaDAO {
             pstmt.setString(2, tarefa.getDescricao());
             pstmt.setString(3, tarefa.getStatus());
 
+            // Set Date fields, handling nulls
+            pstmt.setDate(4, tarefa.getDataInicioPrevista() != null ? new java.sql.Date(tarefa.getDataInicioPrevista().getTime()) : null);
+            pstmt.setDate(5, tarefa.getDataFimPrevista() != null ? new java.sql.Date(tarefa.getDataFimPrevista().getTime()) : null);
+            pstmt.setDate(6, tarefa.getDataInicioReal() != null ? new java.sql.Date(tarefa.getDataInicioReal().getTime()) : null);
+            pstmt.setDate(7, tarefa.getDataFimReal() != null ? new java.sql.Date(tarefa.getDataFimReal().getTime()) : null);
+
             if (tarefa.getProjeto() != null) {
-                pstmt.setInt(4, tarefa.getProjeto().getId());
+                pstmt.setInt(8, tarefa.getProjeto().getId());
             } else {
-                pstmt.setNull(4, Types.INTEGER);
+                pstmt.setNull(8, Types.INTEGER);
             }
 
             if (tarefa.getResponsavel() != null) {
-                pstmt.setInt(5, tarefa.getResponsavel().getId());
+                pstmt.setInt(9, tarefa.getResponsavel().getId());
             } else {
-                pstmt.setNull(5, Types.INTEGER);
+                pstmt.setNull(9, Types.INTEGER);
             }
 
             if (tarefa.getId() != 0) {
-                pstmt.setInt(6, tarefa.getId());
+                pstmt.setInt(10, tarefa.getId());
             }
 
             pstmt.executeUpdate();
@@ -58,7 +64,7 @@ public class TarefaDAO {
      */
     public List<Tarefa> buscarTodas() {
         List<Tarefa> tarefas = new ArrayList<>();
-        String sql = "SELECT t.id, t.titulo, t.descricao, t.status, " +
+        String sql = "SELECT t.*, " + // Select all columns from tarefas
                      "p.id AS projeto_id, p.nome_projeto AS projeto_nome, " +
                      "u.id AS responsavel_id, u.nome_completo AS responsavel_nome " +
                      "FROM tarefas t " +
@@ -76,6 +82,10 @@ public class TarefaDAO {
                 tarefa.setTitulo(rs.getString("titulo"));
                 tarefa.setDescricao(rs.getString("descricao"));
                 tarefa.setStatus(rs.getString("status"));
+                tarefa.setDataInicioPrevista(rs.getDate("data_inicio_prevista"));
+                tarefa.setDataFimPrevista(rs.getDate("data_fim_prevista"));
+                tarefa.setDataInicioReal(rs.getDate("data_inicio_real"));
+                tarefa.setDataFimReal(rs.getDate("data_fim_real"));
 
                 // Associa o projeto
                 if (rs.getObject("projeto_id") != null) {

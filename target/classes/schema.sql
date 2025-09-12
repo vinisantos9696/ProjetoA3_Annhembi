@@ -2,7 +2,9 @@
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome_completo VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NULL,
+    cpf VARCHAR(14) UNIQUE,
+    email VARCHAR(255) UNIQUE,
+    cargo VARCHAR(100),
     login VARCHAR(50) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
     perfil ENUM('administrador', 'gerente', 'colaborador') NOT NULL
@@ -35,8 +37,9 @@ CREATE TABLE IF NOT EXISTS tarefas (
     id_projeto INT NOT NULL,
     id_responsavel INT,
     status ENUM('pendente', 'em execução', 'concluída') NOT NULL,
-    data_inicio DATE,
+    data_inicio_prevista DATE,
     data_fim_prevista DATE,
+    data_inicio_real DATE,
     data_fim_real DATE,
     FOREIGN KEY (id_projeto) REFERENCES projetos(id) ON DELETE CASCADE,
     FOREIGN KEY (id_responsavel) REFERENCES usuarios(id) ON DELETE SET NULL
@@ -62,21 +65,21 @@ CREATE TABLE IF NOT EXISTS projeto_equipes (
 
 -- Inserção de Dados de Exemplo --
 
--- Usuários (10 exemplos)
-INSERT INTO usuarios (id, nome_completo, login, senha, perfil) VALUES
-(1, 'Administrador', 'admin', 'admin', 'administrador'),
-(2, 'Gerente', 'gerente', 'gerente', 'gerente'),
-(3, 'Colaborador', 'colab', 'colab', 'colaborador'),
-(4, 'Beatriz Lima', 'beatriz', 'bia123', 'colaborador'),
-(5, 'Davi Souza', 'davi', 'davi123', 'colaborador'),
-(6, 'Fernanda Costa', 'fernanda', 'fer123', 'gerente'),
-(7, 'Ricardo Almeida', 'ricardo', 'rick123', 'gerente'),
-(8, 'Lucas Martins', 'lucas', 'lucas123', 'colaborador'),
-(9, 'Juliana Pereira', 'juliana', 'ju123', 'colaborador'),
-(10, 'Gabriel Rocha', 'gabriel', 'gabi123', 'colaborador'),
-(11, 'Mariana Barbosa', 'mariana', 'mari123', 'colaborador'),
-(12, 'Thiago Santos', 'thiago', 'thiago123', 'colaborador')
-ON DUPLICATE KEY UPDATE nome_completo=VALUES(nome_completo), login=VALUES(login), senha=VALUES(senha), perfil=VALUES(perfil);
+-- Usuários (com novos campos)
+INSERT INTO usuarios (id, nome_completo, cpf, email, cargo, login, senha, perfil) VALUES
+(1, 'Administrador', '000.000.000-00', 'admin@empresa.com', 'Administrador de Sistemas', 'admin', 'admin', 'administrador'),
+(2, 'Gerente', '111.111.111-11', 'gerente@empresa.com', 'Gerente de Projetos', 'gerente', 'gerente', 'gerente'),
+(3, 'Colaborador', '222.222.222-22', 'colaborador@empresa.com', 'Desenvolvedor Pleno', 'colab', 'colab', 'colaborador'),
+(4, 'Beatriz Lima', '333.333.333-33', 'beatriz.lima@empresa.com', 'Desenvolvedora Frontend', 'beatriz', 'bia123', 'colaborador'),
+(5, 'Davi Souza', '444.444.444-44', 'davi.souza@empresa.com', 'Desenvolvedor Backend', 'davi', 'davi123', 'colaborador'),
+(6, 'Fernanda Costa', '555.555.555-55', 'fernanda.costa@empresa.com', 'Gerente de Projetos Sênior', 'fernanda', 'fer123', 'gerente'),
+(7, 'Ricardo Almeida', '666.666.666-66', 'ricardo.almeida@empresa.com', 'Product Owner', 'ricardo', 'rick123', 'gerente'),
+(8, 'Lucas Martins', '777.777.777-77', 'lucas.martins@empresa.com', 'DBA', 'lucas', 'lucas123', 'colaborador'),
+(9, 'Juliana Pereira', '888.888.888-88', 'juliana.pereira@empresa.com', 'Desenvolvedora Mobile', 'juliana', 'ju123', 'colaborador'),
+(10, 'Gabriel Rocha', '999.999.999-99', 'gabriel.rocha@empresa.com', 'Analista de QA', 'gabriel', 'gabi123', 'colaborador'),
+(11, 'Mariana Barbosa', '101.010.101-01', 'mariana.barbosa@empresa.com', 'Designer UI/UX', 'mariana', 'mari123', 'colaborador'),
+(12, 'Thiago Santos', '121.212.121-21', 'thiago.santos@empresa.com', 'Engenheiro DevOps', 'thiago', 'thiago123', 'colaborador')
+ON DUPLICATE KEY UPDATE nome_completo=VALUES(nome_completo), cpf=VALUES(cpf), email=VALUES(email), cargo=VALUES(cargo), login=VALUES(login), senha=VALUES(senha), perfil=VALUES(perfil);
 
 -- Equipes (5 exemplos)
 INSERT INTO equipes (id_equipe, nome_equipe, descricao) VALUES
@@ -114,16 +117,16 @@ INSERT INTO projeto_equipes (id_projeto, id_equipe) VALUES
 (5, 1)          -- Website com Frontend
 ON DUPLICATE KEY UPDATE id_projeto=VALUES(id_projeto);
 
--- Tarefas (10 exemplos, para ter mais dados)
-INSERT INTO tarefas (id, titulo, descricao, id_projeto, id_responsavel, status, data_inicio, data_fim_prevista) VALUES
-(1, 'Desenvolver Carrinho de Compras', 'Implementar a funcionalidade completa do carrinho de compras no e-commerce.', 1, 3, 'em execução', '2024-05-10', '2024-06-10'),
-(2, 'Criar Tela de Login do App', 'Desenvolver a interface e a lógica de autenticação para o aplicativo financeiro.', 2, 9, 'pendente', '2024-05-15', '2024-06-05'),
-(3, 'Configurar Pipeline de CI/CD', 'Automatizar o processo de build e deploy para o projeto de modernização do ERP.', 3, 12, 'em execução', '2024-04-25', '2024-05-30'),
-(4, 'Testar API de Pagamentos', 'Criar e executar testes de integração para a API de pagamentos do e-commerce.', 1, 10, 'pendente', '2024-05-20', '2024-06-20'),
-(5, 'Migrar Banco de Dados de Clientes', 'Criar script para migrar os dados de clientes do sistema legado para o novo ERP.', 3, 5, 'concluída', '2024-04-01', '2024-04-30'),
-(6, 'Modelar Dashboards de Vendas', 'Definir os principais KPIs e desenhar os dashboards para a plataforma de BI.', 4, 7, 'pendente', '2024-05-25', '2024-06-25'),
-(7, 'Criar Componente de Gráfico', 'Desenvolver um componente reutilizável de gráfico para o portal.', 1, 4, 'em execução', '2024-06-01', '2024-06-30'),
-(8, 'Implementar Notificações Push', 'Adicionar funcionalidade de notificações push no app financeiro.', 2, 9, 'pendente', '2024-06-10', '2024-07-10'),
-(9, 'Otimizar Consultas do Relatório', 'Analisar e otimizar o desempenho das consultas SQL na plataforma de BI.', 4, 8, 'pendente', '2024-06-15', '2024-07-15'),
-(10, 'Ajustar Layout para Blog', 'Adaptar o layout do novo website para incluir uma seção de blog.', 5, 11, 'concluída', '2024-06-01', '2024-06-20')
-ON DUPLICATE KEY UPDATE titulo=VALUES(titulo), descricao=VALUES(descricao), status=VALUES(status), id_responsavel=VALUES(id_responsavel);
+-- Tarefas (com novos campos de data)
+INSERT INTO tarefas (id, titulo, descricao, id_projeto, id_responsavel, status, data_inicio_prevista, data_fim_prevista, data_inicio_real, data_fim_real) VALUES
+(1, 'Desenvolver Carrinho de Compras', 'Implementar a funcionalidade completa do carrinho de compras no e-commerce.', 1, 3, 'em execução', '2024-05-08', '2024-06-10', '2024-05-10', NULL),
+(2, 'Criar Tela de Login do App', 'Desenvolver a interface e a lógica de autenticação para o aplicativo financeiro.', 2, 9, 'pendente', '2024-05-12', '2024-06-05', NULL, NULL),
+(3, 'Configurar Pipeline de CI/CD', 'Automatizar o processo de build e deploy para o projeto de modernização do ERP.', 3, 12, 'em execução', '2024-04-20', '2024-05-30', '2024-04-25', NULL),
+(4, 'Testar API de Pagamentos', 'Criar e executar testes de integração para a API de pagamentos do e-commerce.', 1, 10, 'pendente', '2024-05-18', '2024-06-20', NULL, NULL),
+(5, 'Migrar Banco de Dados de Clientes', 'Criar script para migrar os dados de clientes do sistema legado para o novo ERP.', 3, 5, 'concluída', '2024-03-28', '2024-04-30', '2024-04-01', '2024-04-28'),
+(6, 'Modelar Dashboards de Vendas', 'Definir os principais KPIs e desenhar os dashboards para a plataforma de BI.', 4, 7, 'pendente', '2024-05-22', '2024-06-25', NULL, NULL),
+(7, 'Criar Componente de Gráfico', 'Desenvolver um componente reutilizável de gráfico para o portal.', 1, 4, 'em execução', '2024-05-30', '2024-06-30', '2024-06-01', NULL),
+(8, 'Implementar Notificações Push', 'Adicionar funcionalidade de notificações push no app financeiro.', 2, 9, 'pendente', '2024-06-08', '2024-07-10', NULL, NULL),
+(9, 'Otimizar Consultas do Relatório', 'Analisar e otimizar o desempenho das consultas SQL na plataforma de BI.', 4, 8, 'pendente', '2024-06-12', '2024-07-15', NULL, NULL),
+(10, 'Ajustar Layout para Blog', 'Adaptar o layout do novo website para incluir uma seção de blog.', 5, 11, 'concluída', '2024-05-28', '2024-06-20', '2024-06-01', '2024-06-18')
+ON DUPLICATE KEY UPDATE titulo=VALUES(titulo), descricao=VALUES(descricao), status=VALUES(status), id_responsavel=VALUES(id_responsavel), data_inicio_prevista=VALUES(data_inicio_prevista), data_fim_prevista=VALUES(data_fim_prevista), data_inicio_real=VALUES(data_inicio_real), data_fim_real=VALUES(data_fim_real);

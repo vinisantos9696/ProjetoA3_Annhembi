@@ -29,7 +29,7 @@ public class TelaGerenciarTarefas extends JFrame {
         this.tarefaDAO = new TarefaDAO();
 
         setTitle("Gerenciamento de Tarefas");
-        setSize(900, 600);
+        setSize(1200, 600); // Aumentar largura para novas colunas
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -44,7 +44,7 @@ public class TelaGerenciarTarefas extends JFrame {
         painelBotoes.add(btnExcluir);
 
         // --- Tabela de Tarefas ---
-        String[] colunas = {"ID", "Título", "Status", "Projeto", "Responsável"};
+        String[] colunas = {"ID", "Título", "Status", "Projeto", "Responsável", "Início Previsto", "Fim Previsto", "Início Real", "Fim Real"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -95,7 +95,11 @@ public class TelaGerenciarTarefas extends JFrame {
                 tarefa.getTitulo(), 
                 tarefa.getStatus(),
                 (tarefa.getProjeto() != null) ? tarefa.getProjeto().getNomeProjeto() : "N/A",
-                (tarefa.getResponsavel() != null) ? tarefa.getResponsavel().getNomeCompleto() : "N/A"
+                (tarefa.getResponsavel() != null) ? tarefa.getResponsavel().getNomeCompleto() : "N/A",
+                tarefa.getDataInicioPrevista(),
+                tarefa.getDataFimPrevista(),
+                tarefa.getDataInicioReal(),
+                tarefa.getDataFimReal()
             };
             tableModel.addRow(rowData);
         }

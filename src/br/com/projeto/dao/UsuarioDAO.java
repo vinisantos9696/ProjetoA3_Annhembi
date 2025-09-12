@@ -23,6 +23,9 @@ public class UsuarioDAO {
                     return new Usuario(
                         rs.getInt("id"),
                         rs.getString("nome_completo"),
+                        rs.getString("cpf"),
+                        rs.getString("email"),
+                        rs.getString("cargo"),
                         rs.getString("login"),
                         rs.getString("senha"),
                         rs.getString("perfil")
@@ -38,19 +41,22 @@ public class UsuarioDAO {
 
     public void salvar(Usuario usuario) {
         String sql = (usuario.getId() == 0)
-            ? "INSERT INTO usuarios (nome_completo, login, senha, perfil) VALUES (?, ?, ?, ?)"
-            : "UPDATE usuarios SET nome_completo = ?, login = ?, senha = ?, perfil = ? WHERE id = ?";
+            ? "INSERT INTO usuarios (nome_completo, cpf, email, cargo, login, senha, perfil) VALUES (?, ?, ?, ?, ?, ?, ?)"
+            : "UPDATE usuarios SET nome_completo = ?, cpf = ?, email = ?, cargo = ?, login = ?, senha = ?, perfil = ? WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, usuario.getNomeCompleto());
-            pstmt.setString(2, usuario.getLogin());
-            pstmt.setString(3, usuario.getSenha());
-            pstmt.setString(4, usuario.getPerfil());
+            pstmt.setString(2, usuario.getCpf());
+            pstmt.setString(3, usuario.getEmail());
+            pstmt.setString(4, usuario.getCargo());
+            pstmt.setString(5, usuario.getLogin());
+            pstmt.setString(6, usuario.getSenha());
+            pstmt.setString(7, usuario.getPerfil());
 
             if (usuario.getId() != 0) {
-                pstmt.setInt(5, usuario.getId());
+                pstmt.setInt(8, usuario.getId());
             }
 
             pstmt.executeUpdate();
@@ -64,18 +70,23 @@ public class UsuarioDAO {
 
     public List<Usuario> buscarTodos() {
         List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT id, nome_completo, login, perfil FROM usuarios ORDER BY nome_completo";
+        String sql = "SELECT * FROM usuarios ORDER BY nome_completo";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                Usuario usuario = new Usuario();
-                usuario.setId(rs.getInt("id"));
-                usuario.setNomeCompleto(rs.getString("nome_completo"));
-                usuario.setLogin(rs.getString("login"));
-                usuario.setPerfil(rs.getString("perfil"));
+                Usuario usuario = new Usuario(
+                    rs.getInt("id"),
+                    rs.getString("nome_completo"),
+                    rs.getString("cpf"),
+                    rs.getString("email"),
+                    rs.getString("cargo"),
+                    rs.getString("login"),
+                    rs.getString("senha"),
+                    rs.getString("perfil")
+                );
                 usuarios.add(usuario);
             }
         } catch (SQLException e) {
@@ -87,19 +98,24 @@ public class UsuarioDAO {
 
     public List<Usuario> buscarGerentes() {
         List<Usuario> gerentes = new ArrayList<>();
-        String sql = "SELECT id, nome_completo, login, perfil FROM usuarios WHERE perfil IN ('gerente', 'administrador') ORDER BY nome_completo";
+        String sql = "SELECT * FROM usuarios WHERE perfil IN ('gerente', 'administrador') ORDER BY nome_completo";
 
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.DB_URL, DatabaseConfig.USER, DatabaseConfig.PASSWORD);
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
-                Usuario usuario = new Usuario();
-                usuario.setId(rs.getInt("id"));
-                usuario.setNomeCompleto(rs.getString("nome_completo"));
-                usuario.setLogin(rs.getString("login"));
-                usuario.setPerfil(rs.getString("perfil"));
-                gerentes.add(usuario);
+                Usuario gerente = new Usuario(
+                    rs.getInt("id"),
+                    rs.getString("nome_completo"),
+                    rs.getString("cpf"),
+                    rs.getString("email"),
+                    rs.getString("cargo"),
+                    rs.getString("login"),
+                    rs.getString("senha"),
+                    rs.getString("perfil")
+                );
+                gerentes.add(gerente);
             }
         } catch (SQLException e) {
             System.err.println("Erro ao buscar gerentes: " + e.getMessage());
@@ -128,8 +144,8 @@ public class UsuarioDAO {
         String sql = "SELECT " +
                      "    u.nome_completo, " +
                      "    COUNT(t.id) AS total_tarefas, " +
-                     "    SUM(CASE WHEN t.status = 'Concluído' THEN 1 ELSE 0 END) AS tarefas_concluidas, " +
-                     "    SUM(CASE WHEN t.status = 'Em Andamento' THEN 1 ELSE 0 END) AS tarefas_em_andamento " +
+                     "    SUM(CASE WHEN t.status = 'concluída' THEN 1 ELSE 0 END) AS tarefas_concluidas, " +
+                     "    SUM(CASE WHEN t.status = 'em execução' THEN 1 ELSE 0 END) AS tarefas_em_andamento " +
                      "FROM " +
                      "    usuarios u " +
                      "LEFT JOIN " +
