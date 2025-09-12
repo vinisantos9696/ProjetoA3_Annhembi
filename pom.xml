@@ -3,43 +3,28 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Coordenadas do seu projeto -->
+    <!-- 1. Coordenadas do Projeto -->
     <groupId>br.com.projeto</groupId>
-    <artifactId>gestao-projetos</artifactId>
+    <artifactId>gestao-projetos-a3</artifactId>
     <version>1.0.0</version>
-    <packaging>jar</packaging>
 
-    <name>Sistema de Gestão de Projetos</name>
-
-    <!-- Propriedades do projeto, como a versão do Java -->
+    <!-- 2. Propriedades do Projeto -->
     <properties>
+        <!-- Define a versão do Java para 8 -->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <!-- Garante que os caracteres (acentos, etc.) sejam lidos corretamente -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
-    <!-- Aqui listamos todas as bibliotecas que o projeto precisa (dependências) -->
+    <!-- 3. Dependências (Bibliotecas Externas) -->
     <dependencies>
-
-        <!-- Dependência para o Driver do MySQL -->
-        <!-- O Maven vai baixar isso automaticamente para você -->
+        <!-- Conector do MySQL -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.0.33</version>
         </dependency>
-
     </dependencies>
-
-    <build>
-        <plugins>
-            <!-- Plugin para garantir que o Maven use a versão correta do Java para compilar -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
