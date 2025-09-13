@@ -32,7 +32,7 @@ public class TelaGerenciarUsuarios extends JFrame {
         this.usuarioDAO = new UsuarioDAO();
 
         setTitle("Gerenciamento de Usuários");
-        setSize(1200, 600); // Aumentar largura
+        setSize(1200, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -134,7 +134,7 @@ public class TelaGerenciarUsuarios extends JFrame {
         this.usuariosAtuais = usuarioDAO.buscarTodos();
         for (Usuario usuario : this.usuariosAtuais) {
             tableModel.addRow(new Object[]{
-                usuario.getId(),
+                String.format("%03d", usuario.getId()), // Formata o ID
                 usuario.getNomeCompleto(),
                 usuario.getCpf(),
                 usuario.getEmail(),
@@ -161,7 +161,8 @@ public class TelaGerenciarUsuarios extends JFrame {
         int selectedRow = tabelaUsuarios.getSelectedRow();
         if (selectedRow >= 0) {
             int modelRow = tabelaUsuarios.convertRowIndexToModel(selectedRow);
-            int usuarioId = (int) tableModel.getValueAt(modelRow, 0);
+            String idFormatado = (String) tableModel.getValueAt(modelRow, 0);
+            int usuarioId = Integer.parseInt(idFormatado); // Converte de volta para int
             return usuariosAtuais.stream().filter(u -> u.getId() == usuarioId).findFirst().orElse(null);
         }
         return null;

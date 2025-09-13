@@ -147,7 +147,11 @@ public class TelaGerenciarEquipes extends JFrame {
         this.equipesAtuais = equipeDAO.buscarTodas();
         
         for (Equipe equipe : this.equipesAtuais) {
-            Object[] rowData = { equipe.getIdEquipe(), equipe.getNomeEquipe(), equipe.getDescricao() };
+            Object[] rowData = { 
+                String.format("%03d", equipe.getIdEquipe()), // Formata o ID
+                equipe.getNomeEquipe(), 
+                equipe.getDescricao() 
+            };
             tableModel.addRow(rowData);
         }
     }
@@ -170,7 +174,8 @@ public class TelaGerenciarEquipes extends JFrame {
         int selectedRow = tabelaEquipes.getSelectedRow();
         if (selectedRow >= 0) {
             int modelRow = tabelaEquipes.convertRowIndexToModel(selectedRow);
-            int equipeId = (int) tableModel.getValueAt(modelRow, 0);
+            String idFormatado = (String) tableModel.getValueAt(modelRow, 0);
+            int equipeId = Integer.parseInt(idFormatado); // Converte de volta para int
             // Usa o método buscarPorId para carregar o objeto completo com membros e projetos
             return equipeDAO.buscarPorId(equipeId);
         }

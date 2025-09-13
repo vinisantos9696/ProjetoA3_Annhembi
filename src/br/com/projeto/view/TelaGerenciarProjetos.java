@@ -149,7 +149,7 @@ public class TelaGerenciarProjetos extends JFrame {
 
         for (Projeto projeto : this.projetosAtuais) {
             Object[] rowData = {
-                projeto.getId(),
+                String.format("%03d", projeto.getId()), // Formata o ID
                 projeto.getNomeProjeto(),
                 projeto.getStatus(),
                 projeto.getDataInicio(),
@@ -178,7 +178,8 @@ public class TelaGerenciarProjetos extends JFrame {
         int selectedRow = tabelaProjetos.getSelectedRow();
         if (selectedRow >= 0) {
             int modelRow = tabelaProjetos.convertRowIndexToModel(selectedRow);
-            int projetoId = (int) tableModel.getValueAt(modelRow, 0);
+            String idFormatado = (String) tableModel.getValueAt(modelRow, 0);
+            int projetoId = Integer.parseInt(idFormatado); // Converte de volta para int
             return projetosAtuais.stream().filter(p -> p.getId() == projetoId).findFirst().orElse(null);
         }
         return null;

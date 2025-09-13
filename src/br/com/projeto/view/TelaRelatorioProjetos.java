@@ -60,7 +60,7 @@ public class TelaRelatorioProjetos extends JFrame {
         // Preenche o modelo com os dados dos projetos
         for (Projeto projeto : projetos) {
             Object[] rowData = {
-                projeto.getId(),
+                String.format("%03d", projeto.getId()), // Formata o ID
                 projeto.getNomeProjeto(),
                 projeto.getStatus(),
                 projeto.getDataInicio(),

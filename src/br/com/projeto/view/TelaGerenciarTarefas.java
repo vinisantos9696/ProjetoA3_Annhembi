@@ -148,7 +148,7 @@ public class TelaGerenciarTarefas extends JFrame {
         
         for (Tarefa tarefa : this.tarefasAtuais) {
             Object[] rowData = { 
-                tarefa.getId(), 
+                String.format("%03d", tarefa.getId()), // Formata o ID
                 tarefa.getTitulo(), 
                 tarefa.getStatus(),
                 (tarefa.getProjeto() != null) ? tarefa.getProjeto().getNomeProjeto() : "N/A",
@@ -180,7 +180,8 @@ public class TelaGerenciarTarefas extends JFrame {
         int selectedRow = tabelaTarefas.getSelectedRow();
         if (selectedRow >= 0) {
             int modelRow = tabelaTarefas.convertRowIndexToModel(selectedRow);
-            int tarefaId = (int) tableModel.getValueAt(modelRow, 0);
+            String idFormatado = (String) tableModel.getValueAt(modelRow, 0);
+            int tarefaId = Integer.parseInt(idFormatado); // Converte de volta para int
             return tarefasAtuais.stream().filter(t -> t.getId() == tarefaId).findFirst().orElse(null);
         }
         return null;
