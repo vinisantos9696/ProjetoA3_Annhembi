@@ -28,8 +28,8 @@ O sistema foi projetado para ser uma solução robusta e intuitiva para pequenas
 *   **Linguagem:** Java
 *   **Interface Gráfica:** Java Swing
 *   **Banco de Dados:** MySQL
-*   **Build Tool:** Maven (implícito pelo uso de dependências como o MySQL Connector)
-*   **IDE de Desenvolvimento:** IntelliJ IDEA (ou outra de sua preferência)
+*   **Build Tool:** Maven
+*   **IDE Recomendada:** IntelliJ IDEA
 
 ## 4. Configuração e Execução
 
@@ -39,7 +39,7 @@ Siga estes passos para configurar e executar o projeto em sua máquina local.
 
 *   **Java Development Kit (JDK):** Versão 8 ou superior.
 *   **MySQL Server:** Versão 8 ou superior.
-*   **IDE Java:** IntelliJ IDEA, Eclipse ou outra de sua preferência.
+*   **IntelliJ IDEA:** Community ou Ultimate Edition.
 
 ### Passo 1: Configurar as Variáveis de Ambiente
 
@@ -60,9 +60,19 @@ A aplicação precisa saber o **usuário** e a **senha** do seu banco de dados M
 
 6.  Clique em **OK** para salvar as variáveis e depois em **Apply** e **OK** para fechar as configurações.
 
-### Passo 2: Executar o Projeto
+### Passo 2: Configurar o Projeto no IntelliJ IDEA
 
-1.  Abra a classe `br.com.projeto.main.Main.java`.
+Ao abrir o projeto, pode ser necessário indicar manualmente a estrutura de pastas para que a IDE reconheça o código-fonte.
+
+1.  Na janela de `Project` (geralmente à esquerda), clique com o botão direito na pasta `src`.
+2.  Navegue até **`Mark Directory as`**.
+3.  Selecione **`Sources Root`**.
+
+A pasta `src` deve ficar azul. Isso informa à IDE onde encontrar os pacotes e o código-fonte do projeto, permitindo que a aplicação seja executada corretamente.
+
+### Passo 3: Executar o Projeto
+
+1.  Após configurar o `Sources Root`, navegue até a classe `br.com.projeto.main.Main.java`.
 2.  Clique no botão verde de "Play" ao lado do método `main` para executar a aplicação.
 
 > **Como funciona o Banco de Dados:** Na primeira vez que a aplicação é executada, ela cria o banco de dados `gestao_projetos_db` e o popula com dados de exemplo. A partir da segunda execução, a aplicação apenas se conecta ao banco de dados existente, **preservando todos os dados** que foram cadastrados.
