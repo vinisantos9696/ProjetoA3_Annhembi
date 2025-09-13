@@ -4,8 +4,11 @@ import br.com.projeto.model.Projeto;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.List;
 
@@ -14,26 +17,45 @@ import java.util.List;
  */
 public class TelaRelatorioProjetos extends JFrame {
 
+    private JTable tabelaProjetos;
+    private DefaultTableModel tableModel;
+    private TableRowSorter<DefaultTableModel> sorter;
+    private JTextField txtFiltro;
+    private JComboBox<String> cmbColunaFiltro;
+
     public TelaRelatorioProjetos(List<Projeto> projetos) {
         setTitle("Relatório - Andamento dos Projetos");
-        setSize(800, 400);
+        setSize(900, 500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         // --- Painel Principal com Margem ---
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Adiciona margem de 10px
+        JPanel mainPanel = new JPanel(new BorderLayout(0, 10)); // Adiciona espaçamento vertical
+        mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // --- Criação da Tabela ---
+        // --- Criação da Tabela (precisa ser criada antes do painel de filtro) ---
         String[] colunas = {"ID", "Nome do Projeto", "Status", "Data de Início", "Data Prev. Fim", "Gerente"};
-
-        // Cria o modelo da tabela, tornando as células não editáveis
-        DefaultTableModel tableModel = new DefaultTableModel(colunas, 0) {
+        tableModel = new DefaultTableModel(colunas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Impede a edição de qualquer célula
+                return false;
             }
         };
+        tabelaProjetos = new JTable(tableModel);
+
+        // --- Painel de Filtro ---
+        JPanel painelFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        painelFiltro.add(new JLabel("Filtrar por:"));
+        cmbColunaFiltro = new JComboBox<>();
+        cmbColunaFiltro.addItem("Todas as Colunas");
+        for (String coluna : colunas) {
+            cmbColunaFiltro.addItem(coluna);
+        }
+        painelFiltro.add(cmbColunaFiltro);
+        painelFiltro.add(new JLabel("Valor:"));
+        txtFiltro = new JTextField(30);
+        painelFiltro.add(txtFiltro);
+        mainPanel.add(painelFiltro, BorderLayout.NORTH);
 
         // Preenche o modelo com os dados dos projetos
         for (Projeto projeto : projetos) {
@@ -43,17 +65,19 @@ public class TelaRelatorioProjetos extends JFrame {
                 projeto.getStatus(),
                 projeto.getDataInicio(),
                 projeto.getDataFimPrevista(),
-                (projeto.getGerente() != null) ? projeto.getGerente().getNomeCompleto() : projeto.getIdGerente()
+                (projeto.getGerente() != null) ? projeto.getGerente().getNomeCompleto() : "N/A"
             };
             tableModel.addRow(rowData);
         }
 
-        // Cria a JTable com o modelo preenchido
-        JTable tabelaProjetos = new JTable(tableModel);
-        tabelaProjetos.setFillsViewportHeight(true); // Garante que a tabela preencha a altura da viewport
-        tabelaProjetos.getTableHeader().setReorderingAllowed(false); // Impede a reordenação das colunas
-        tabelaProjetos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12)); // Deixa o cabeçalho em negrito
-        tabelaProjetos.setRowHeight(25); // Aumenta a altura da linha para melhor leitura
+        // Configuração final da tabela
+        tabelaProjetos.setFillsViewportHeight(true);
+        tabelaProjetos.getTableHeader().setReorderingAllowed(false);
+        tabelaProjetos.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
+        tabelaProjetos.setRowHeight(25);
+
+        sorter = new TableRowSorter<>(tableModel);
+        tabelaProjetos.setRowSorter(sorter);
 
         // --- Ajuste de Largura das Colunas ---
         TableColumnModel columnModel = tabelaProjetos.getColumnModel();
@@ -65,13 +89,46 @@ public class TelaRelatorioProjetos extends JFrame {
         columnModel.getColumn(4).setPreferredWidth(100); // Data Prev. Fim
         columnModel.getColumn(5).setPreferredWidth(150); // Gerente
 
-        // Adiciona a tabela a um painel com rolagem
         JScrollPane scrollPane = new JScrollPane(tabelaProjetos);
-
-        // Adiciona o painel de rolagem ao painel principal
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // Adiciona o painel principal à janela
         add(mainPanel);
+
+        // --- Ações do Filtro ---
+        DocumentListener listenerFiltro = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { aplicarFiltro(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { aplicarFiltro(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { aplicarFiltro(); }
+        };
+        txtFiltro.getDocument().addDocumentListener(listenerFiltro);
+        cmbColunaFiltro.addActionListener(e -> aplicarFiltro());
+    }
+
+    private void aplicarFiltro() {
+        String texto = txtFiltro.getText();
+        String colunaSelecionada = (String) cmbColunaFiltro.getSelectedItem();
+
+        if (texto.trim().length() == 0) {
+            sorter.setRowFilter(null);
+        } else {
+            int indiceColuna = -1;
+            if (colunaSelecionada != null && !"Todas as Colunas".equals(colunaSelecionada)) {
+                for (int i = 0; i < tableModel.getColumnCount(); i++) {
+                    if (tableModel.getColumnName(i).equals(colunaSelecionada)) {
+                        indiceColuna = i;
+                        break;
+                    }
+                }
+            }
+
+            if (indiceColuna != -1) {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto, indiceColuna));
+            } else {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto));
+            }
+        }
     }
 }

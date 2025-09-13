@@ -5,7 +5,10 @@ import br.com.projeto.model.Tarefa;
 import br.com.projeto.model.Usuario;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.List;
 
@@ -19,31 +22,37 @@ public class TelaGerenciarTarefas extends JFrame {
     private DefaultTableModel tableModel;
     private final TarefaDAO tarefaDAO;
     private List<Tarefa> tarefasAtuais;
+    private TableRowSorter<DefaultTableModel> sorter;
 
     private final JButton btnNova;
     private final JButton btnEditar;
     private final JButton btnExcluir;
+    private final JTextField txtFiltro;
+    private final JComboBox<String> cmbColunaFiltro;
 
     public TelaGerenciarTarefas(Usuario usuario) {
         this.usuarioLogado = usuario;
         this.tarefaDAO = new TarefaDAO();
 
         setTitle("Gerenciamento de Tarefas");
-        setSize(1200, 600); // Aumentar largura para novas colunas
+        setSize(1200, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // --- Painel de Botões ---
+        // --- Painel Superior (com botões e filtro) ---
+        JPanel painelSuperior = new JPanel(new BorderLayout());
+
+        // Painel de Botões
         JPanel painelBotoes = new JPanel(new FlowLayout(FlowLayout.LEFT));
         btnNova = new JButton("Nova Tarefa");
         btnEditar = new JButton("Editar Tarefa");
         btnExcluir = new JButton("Excluir Tarefa");
-
         painelBotoes.add(btnNova);
         painelBotoes.add(btnEditar);
         painelBotoes.add(btnExcluir);
+        painelSuperior.add(painelBotoes, BorderLayout.NORTH);
 
-        // --- Tabela de Tarefas ---
+        // --- Tabela de Tarefas (precisa ser criada antes do painel de filtro) ---
         String[] colunas = {"ID", "Título", "Status", "Projeto", "Responsável", "Início Previsto", "Fim Previsto", "Início Real", "Fim Real"};
         tableModel = new DefaultTableModel(colunas, 0) {
             @Override
@@ -52,27 +61,78 @@ public class TelaGerenciarTarefas extends JFrame {
             }
         };
         tabelaTarefas = new JTable(tableModel);
+
+        // Painel de Filtro
+        JPanel painelFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        painelFiltro.add(new JLabel("Filtrar por:"));
+        cmbColunaFiltro = new JComboBox<>();
+        cmbColunaFiltro.addItem("Todas as Colunas");
+        for (String coluna : colunas) {
+            cmbColunaFiltro.addItem(coluna);
+        }
+        painelFiltro.add(cmbColunaFiltro);
+        painelFiltro.add(new JLabel("Valor:"));
+        txtFiltro = new JTextField(30);
+        painelFiltro.add(txtFiltro);
+        painelSuperior.add(painelFiltro, BorderLayout.SOUTH);
+
+        // Configuração final da tabela
         tabelaTarefas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        sorter = new TableRowSorter<>(tableModel);
+        tabelaTarefas.setRowSorter(sorter);
 
         JScrollPane scrollPane = new JScrollPane(tabelaTarefas);
 
         // Adiciona os componentes à janela
-        add(painelBotoes, BorderLayout.NORTH);
+        add(painelSuperior, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
 
-        // --- Ações dos Botões ---
+        // --- Ações dos Botões e Filtro ---
         btnNova.addActionListener(e -> abrirFormulario(null));
         btnEditar.addActionListener(e -> abrirFormulario(getTarefaSelecionada()));
         btnExcluir.addActionListener(e -> excluirTarefa());
+
+        DocumentListener listenerFiltro = new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) { aplicarFiltro(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { aplicarFiltro(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { aplicarFiltro(); }
+        };
+        txtFiltro.getDocument().addDocumentListener(listenerFiltro);
+        cmbColunaFiltro.addActionListener(e -> aplicarFiltro());
 
         // Carrega os dados iniciais e aplica as permissões
         carregarTarefas();
         configurarPermissoes();
     }
 
-    /**
-     * Habilita ou desabilita os botões de gerenciamento com base no perfil do usuário.
-     */
+    private void aplicarFiltro() {
+        String texto = txtFiltro.getText();
+        String colunaSelecionada = (String) cmbColunaFiltro.getSelectedItem();
+
+        if (texto.trim().length() == 0) {
+            sorter.setRowFilter(null);
+        } else {
+            int indiceColuna = -1;
+            if (colunaSelecionada != null && !"Todas as Colunas".equals(colunaSelecionada)) {
+                for (int i = 0; i < tableModel.getColumnCount(); i++) {
+                    if (tableModel.getColumnName(i).equals(colunaSelecionada)) {
+                        indiceColuna = i;
+                        break;
+                    }
+                }
+            }
+
+            if (indiceColuna != -1) {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto, indiceColuna));
+            } else {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + texto));
+            }
+        }
+    }
+
     private void configurarPermissoes() {
         String perfil = usuarioLogado.getPerfil();
         boolean podeGerenciar = "administrador".equalsIgnoreCase(perfil) || "gerente".equalsIgnoreCase(perfil);
@@ -82,9 +142,6 @@ public class TelaGerenciarTarefas extends JFrame {
         btnExcluir.setEnabled(podeGerenciar);
     }
 
-    /**
-     * Carrega a lista de tarefas do banco de dados e atualiza a tabela.
-     */
     private void carregarTarefas() {
         tableModel.setRowCount(0);
         this.tarefasAtuais = tarefaDAO.buscarTodas();
@@ -105,10 +162,6 @@ public class TelaGerenciarTarefas extends JFrame {
         }
     }
 
-    /**
-     * Abre o formulário para criar ou editar uma tarefa.
-     * @param tarefa A tarefa a ser editada, ou null para uma nova.
-     */
     private void abrirFormulario(Tarefa tarefa) {
         if (tarefa == null && btnEditar.isFocusOwner()) {
             JOptionPane.showMessageDialog(this, "Por favor, selecione uma tarefa para editar.", "Nenhuma Tarefa Selecionada", JOptionPane.WARNING_MESSAGE);
@@ -123,22 +176,16 @@ public class TelaGerenciarTarefas extends JFrame {
         }
     }
 
-    /**
-     * Pega o objeto Tarefa correspondente à linha selecionada na tabela.
-     * @return A tarefa selecionada, ou null se nenhuma linha for selecionada.
-     */
     private Tarefa getTarefaSelecionada() {
         int selectedRow = tabelaTarefas.getSelectedRow();
         if (selectedRow >= 0) {
-            int tarefaId = (int) tableModel.getValueAt(selectedRow, 0);
+            int modelRow = tabelaTarefas.convertRowIndexToModel(selectedRow);
+            int tarefaId = (int) tableModel.getValueAt(modelRow, 0);
             return tarefasAtuais.stream().filter(t -> t.getId() == tarefaId).findFirst().orElse(null);
         }
         return null;
     }
 
-    /**
-     * Exclui a tarefa selecionada na tabela após confirmação.
-     */
     private void excluirTarefa() {
         Tarefa tarefa = getTarefaSelecionada();
         if (tarefa != null) {
@@ -150,6 +197,7 @@ public class TelaGerenciarTarefas extends JFrame {
             if (confirm == JOptionPane.YES_OPTION) {
                 tarefaDAO.excluir(tarefa.getId());
                 carregarTarefas();
+                aplicarFiltro();
                 JOptionPane.showMessageDialog(this, "Tarefa excluída com sucesso!");
             }
         } else {
